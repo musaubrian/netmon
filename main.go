@@ -47,7 +47,7 @@ func main() {
 	go Server()
 
 	// Create a ticker that ticks every 5 minutes
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(5 * time.Minute)
 
 	for {
 		var r []record
