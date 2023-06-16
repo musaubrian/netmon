@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <title>Graph</title>
+  </head>
+  <body>
+    <div
+      class="display: inline-flex; justify-content: center; align-items: center; width: 100vw;height: 100%;"
+    >
+      <canvas
+        id="myChart"
+        style="max-width: 100%; max-height: 70vh; height: 50vh"
+      ></canvas>
+    </div>
+  </body>
+  <script>
+    function fetchLogs() {
+      return fetch("/logs")
+        .then((response) => response.json())
+        .then((data) => {
+          let records = data.records;
+          let newxValues = [];
+          let newyValues = [];
+
+          let startLoopIndex = Math.max(0, records.length - 20); // Get last 20 values (most recent)
+
+          for (let i = startLoopIndex; i < records.length; i++) {
+            let record = records[i];
+            for (let j = 0; j < record.length; j++) {
+              newxValues.push(record[j].start);
+              newyValues.push(record[j].latency);
+            }
+          }
+
+          // Replace x&yValues with new values
+          xValues.splice(0, xValues.length, ...newxValues);
+          yValues.splice(0, yValues.length, ...newyValues);
+          // xValues.push(...newxValues);
+          // yValues.push(...newyValues);
+          // Trigger chart update
+          myChart.data.labels = xValues;
+          myChart.data.datasets[0].data = yValues;
+          myChart.update();
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+
+    const xValues = [];
+    const yValues = [];
+
+    const myChart = new Chart("myChart", {
+      type: "line",
+      data: {
+        labels: xValues,
+        datasets: [
+          {
+            fill: false,
+            lineTension: 0.15,
+            pointRadius: 0,
+            backgroundColor: "blue",
+            borderColor: "rgba(42, 29, 245, 0.8)",
+            data: yValues,
+          },
+        ],
+      },
+      options: {
+        animation: {
+          duration: 100,
+          easing: "linear",
+        },
+        legend: { display: false },
+        scales: {
+          xAxes: [
+            {
+              ticks: { display: false },
+              scaleLabel: {
+                display: true,
+                labelString: "Requests",
+              },
+            },
+          ],
+          yAxes: [
+            {
+              ticks: { min: 0 },
+              scaleLabel: {
+                display: true,
+                labelString: "Time to respond (milliseconds)",
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    setInterval(fetchLogs, 10000);
+  </script>
+</html>

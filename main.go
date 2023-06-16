@@ -1,19 +1,17 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
 
 type record struct {
 	Start   time.Time `json:"start"`
-	Latency float64   `json:"latency"`
+	Latency uint16    `json:"latency"`
 }
 
 type logr struct {
@@ -22,22 +20,34 @@ type logr struct {
 	Records   [][]record `json:"records"`
 }
 
+var (
+	dRecs   logr
+	limit   = 600 * time.Millisecond
+	records [][]record
+)
+
 func main() {
 	var fName string
-	var records [][]record
 	today := time.Now()
 	todayStr := today.Format(time.ANSIC)
 	server := "https://8.8.8.8"
+	timeOutCount := 0
+	tRec := []uint16{}
+
 	f := strings.Split(todayStr, " ")
 	for i := 0; i < 3; i++ {
 		fName += "_" + f[i]
 	}
+	fName = fName + "_errs"
 
-	limit := 1 * time.Second
-	timeOutErr := "context deadline exceeded"
 	client := &http.Client{
 		Timeout: limit,
 	}
+	// Start up http server
+	go Server()
+
+	// Create a ticker that ticks every 5 minutes
+	ticker := time.NewTicker(10 * time.Second)
 
 	for {
 		var r []record
@@ -45,59 +55,81 @@ func main() {
 		start := time.Now()
 		_, err := client.Get(server)
 		if err != nil {
-			if err.Error() == timeOutErr {
-				log.Fatal("TIMED OUT:", err)
+			if e, ok := err.(net.Error); ok && e.Timeout() {
+				timeOutCount++
 			} else {
-				log.Fatal("ERROR:", err)
+				log.Println("ERROR:", err)
+				timeOutCount++
 			}
 		}
 
 		latency := time.Since(start)
 		r = append(r,
 			record{
-				Start: start, Latency: latency.Seconds(),
+				Start: start, Latency: uint16(latency.Milliseconds()),
 			})
+		tRec = append(tRec, uint16(latency.Milliseconds()))
+		if timeOutCount == 5 {
+			alertOnTimeouts(tRec[len(tRec)-5:])
+			// Reset values
+			tRec = []uint16{}
+			timeOutCount = 0
+		}
+
 		records = append(records, r)
 
-		dRecs := logr{
+		dRecs = logr{
 			Day:       todayStr,
 			UpdatedAt: time.Now().Format(time.TimeOnly),
 			Records:   records,
 		}
 
-		go func() {
-			err := createLog(fName, dRecs)
-			if err != nil {
-				log.Println(err)
-			}
-		}()
-		time.Sleep(5 * time.Second)
-
+		// clear records every 5 minutes
+		select {
+		case <-ticker.C:
+			clearRecords()
+		default:
+		}
 	}
 }
 
-func createLog(fName string, d logr) error {
+func alertOnTimeouts(timeOuts []uint16) {
+	fmt.Println(timeOuts)
+	averageTimeout := avgLatency(timeOuts)
+	fmt.Println(averageTimeout)
+	fmt.Printf("Average of 5 timeouts: %d\n", averageTimeout)
+	if averageTimeout >= uint16(limit) || averageTimeout <= uint16(limit)+1 {
+		fmt.Println("Average of 3 timeouts reached 800!")
+	}
+}
+
+func avgLatency(l []uint16) uint16 {
+	var avg uint16
+	var t uint16
+
+	for _, v := range l {
+		t += v
+	}
+	avg = t / uint16(len(l))
+
+	return avg
+}
+
+func clearRecords() {
+	records = [][]record{}
+}
+
+/*func createLog(fName string, d logr) error {
 	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0o660)
 	if err != nil {
 		return errors.Join(errors.New("COULD NOT CREATE FILE:"), err)
 	}
 	defer f.Close()
-
 	jsonData, err := json.Marshal(d)
 	if err != nil {
 		return errors.Join(errors.New("MARSHALLING FAILED:"), err)
 	}
-
 	f.WriteString(string(jsonData))
 	fmt.Println("File written to")
 	return nil
-}
-
-func printJSON(d logr) {
-	jsonData, err := json.Marshal(d)
-	if err != nil {
-		log.Fatal("JSON marshaling failed:", err)
-	}
-
-	fmt.Println(string(jsonData))
-}
+}*/
