@@ -5,28 +5,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <title>Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
+      rel="stylesheet"
+    />
+    <title>NetMon</title>
   </head>
-  <body>
+  <body style="font-family: 'Varela Round', sans-serif">
     <div
-      class="display: inline-flex; justify-content: center; align-items: center; width: 100vw;height: 100%;"
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: auto;
+      "
     >
+      <h1 id="h1" style="text-align: center; margin-bottom: 0"></h1>
+      <h2 id="h2" style="text-align: center"></h2>
       <canvas
         id="myChart"
-        style="max-width: 100%; max-height: 70vh; height: 50vh"
+        style="max-height: 70vh; height: 50vh; max-width: 90vw"
       ></canvas>
     </div>
   </body>
   <script>
+    const h1 = document.getElementById("h1");
+    const h2 = document.getElementById("h2");
+
     function fetchLogs() {
       return fetch("/logs")
         .then((response) => response.json())
         .then((data) => {
           let records = data.records;
+          h1.innerHTML = data.day;
+          h2.innerHTML = `Updated at: ${data.updated_at}`;
           let newxValues = [];
           let newyValues = [];
 
-          let startLoopIndex = Math.max(0, records.length -35); // Get last 35 items
+          let startLoopIndex = Math.max(0, records.length - 60); // Get last 60 items(minute)
 
           for (let i = startLoopIndex; i < records.length; i++) {
             let record = records[i];
@@ -39,8 +59,6 @@
           // // Replace x&yValues with new values
           xValues.splice(0, xValues.length, ...newxValues);
           yValues.splice(0, yValues.length, ...newyValues);
-          // xValues.push(...newxValues);
-          // yValues.push(...newyValues);
 
           // Trigger chart update
           myChart.data.labels = xValues;
@@ -64,17 +82,13 @@
             fill: false,
             lineTension: 0.15,
             pointRadius: 0,
-            backgroundColor: "blue",
+            backgroundColor: "white",
             borderColor: "rgba(42, 29, 245, 0.8)",
             data: yValues,
           },
         ],
       },
       options: {
-        animation: {
-          duration: 100,
-          easing: "linear",
-        },
         legend: { display: false },
         scales: {
           xAxes: [
@@ -82,13 +96,13 @@
               ticks: { display: false },
               scaleLabel: {
                 display: true,
-                labelString: "Requests",
+                labelString: "Requests in a minute",
               },
             },
           ],
           yAxes: [
             {
-              ticks: { min: 0 },
+              ticks: { min: 1, max: 50 },
               scaleLabel: {
                 display: true,
                 labelString: "Time to respond (milliseconds)",
@@ -99,6 +113,9 @@
       },
     });
 
-    setInterval(fetchLogs, 20000);
+    //initial fetch
+    fetchLogs();
+    // the rest
+    setInterval(fetchLogs, 60*1000);
   </script>
 </html>

@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net"
-	"net/http"
 	"strings"
 	"time"
+
+	probing "github.com/prometheus-community/pro-bing"
 )
 
 type record struct {
@@ -22,63 +21,60 @@ type logr struct {
 
 var (
 	dRecs   logr
-	limit   = 700 * time.Millisecond
 	records [][]record
 )
 
+func minimalDate(d string) string {
+	var f string
+	u := strings.Split(d, " ")
+	f = u[0] + " " + u[1]
+	return f
+}
+
 func main() {
-	var fName string
 	today := time.Now()
-	todayStr := today.Format(time.ANSIC)
-	server := "https://8.8.8.8"
-	timeOutCount := 0
-	tRec := []uint16{}
+	todayStr := minimalDate(today.Format(time.RFC850))
+	server := "8.8.8.8"
 
-	f := strings.Split(todayStr, " ")
-	for i := 0; i < 3; i++ {
-		fName += "_" + f[i]
-	}
-	fName = fName + "_errs"
-
-	client := &http.Client{
-		Timeout: limit,
-	}
 	// Start up http server
 	go Server()
 
 	// Create a ticker that ticks every minute
-	ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(5 * time.Minute)
 
 	for {
 		var r []record
+		// initializa new pinger
+		pinger, err := probing.NewPinger(server)
+		if err != nil {
+            log.Fatal("PINGER INITIALIZATION ERR: ",err)
+		}
+        pinger.Count = 5
+		pinger.Timeout = 500 * time.Millisecond
 
 		start := time.Now()
-		_, err := client.Get(server)
+		err = pinger.Run()
 		if err != nil {
-			if e, ok := err.(net.Error); ok && e.Timeout() {
+			if err := sendMail(); err != nil {
+				log.Fatal(err)
+			}
+			log.Println("PINGER ERR: ", err)
+		}
+		// results from the 5 pings
+		stats := pinger.Statistics()
+		// fmt.Printf("%+v\n\n", *stats)
+		latency := stats.AvgRtt
+		if stats.PacketLoss > 25 {
+			err := sendMail()
+			if err != nil {
 				log.Println(err)
-				timeOutCount++
-			} else {
-				log.Println("ERROR:", err)
-				timeOutCount++
 			}
 		}
 
-		latency := time.Since(start)
 		r = append(r,
 			record{
 				Start: start, Latency: uint16(latency.Milliseconds()),
 			})
-		tRec = append(tRec, uint16(latency.Milliseconds()))
-		if timeOutCount == 5 {
-			err := alertOnTimeouts(tRec[len(tRec)-5:])
-			if err != nil {
-				log.Fatal(err)
-			}
-			// Reset values
-			tRec = []uint16{}
-			timeOutCount = 0
-		}
 
 		records = append(records, r)
 
@@ -95,34 +91,8 @@ func main() {
 		default:
 		}
 		time.Sleep(1 * time.Second)
-	}
-}
 
-func alertOnTimeouts(timeOuts []uint16) error {
-	fmt.Println(timeOuts)
-	averageTimeout := avgLatency(timeOuts)
-	fmt.Println(averageTimeout)
-	fmt.Printf("Average of 5 timeouts: %d\n", averageTimeout)
-	if averageTimeout >= uint16(limit) || averageTimeout <= uint16(limit)+1 {
-		fmt.Println("Average of 3 timeouts reached 800!")
 	}
-	err := sendMail()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func avgLatency(l []uint16) uint16 {
-	var avg uint16
-	var t uint16
-
-	for _, v := range l {
-		t += v
-	}
-	avg = t / uint16(len(l))
-
-	return avg
 }
 
 func clearRecords() {

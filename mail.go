@@ -22,18 +22,27 @@ func sendMail() error {
 	// SMTP server details
 	smtpHost := "smtp.gmail.com"
 	smtpAddr := smtpHost + ":587"
+	msg := `Greetings, mortal!
 
-	message := []byte("To:" + to[0] + "\r\n" + "Subject: Possible downtime detected!\r\n" +
+There has been a worrisome development within our domain. The latencies have soared to unprecedented heights, threatening our network's very existence. 
+Summon your expertise and investigate this matter with utmost urgency.
+
+The fate of our network lays in your hands.
+
+Signed,
+The Superior NetMon`
+
+	email := []byte("To:" + to[0] + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
 		"\r\n" +
-		"You might want to have the other ISP on standby")
+		msg)
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err = smtp.SendMail(smtpAddr, auth, from, to, message)
+	err = smtp.SendMail(smtpAddr, auth, from, to, email)
 	if err != nil {
 		return err
 	}
 
-	log.Fatal("Email sent successfully!")
+	log.Println("L1 NOTIFIED")
 	return nil
 }
 
