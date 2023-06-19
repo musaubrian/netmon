@@ -26,7 +26,7 @@
           let newxValues = [];
           let newyValues = [];
 
-          let startLoopIndex = Math.max(0, records.length - 30); // Get last 20 values (most recent)
+          let startLoopIndex = Math.max(0, records.length -35); // Get last 35 items
 
           for (let i = startLoopIndex; i < records.length; i++) {
             let record = records[i];
@@ -37,10 +37,11 @@
           }
 
           // // Replace x&yValues with new values
-          // xValues.splice(0, xValues.length, ...newxValues);
-          // yValues.splice(0, yValues.length, ...newyValues);
-          xValues.push(...newxValues);
-          yValues.push(...newyValues);
+          xValues.splice(0, xValues.length, ...newxValues);
+          yValues.splice(0, yValues.length, ...newyValues);
+          // xValues.push(...newxValues);
+          // yValues.push(...newyValues);
+
           // Trigger chart update
           myChart.data.labels = xValues;
           myChart.data.datasets[0].data = yValues;
@@ -98,6 +99,6 @@
       },
     });
 
-    setInterval(fetchLogs, 10000);
+    setInterval(fetchLogs, 20000);
   </script>
 </html>

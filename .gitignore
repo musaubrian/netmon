@@ -8,7 +8,7 @@ github.Gitignore{Name:"Go", Source:"# If you prefer the allow list template inst
 *.so
 *.dylib
 _*
-
+.env
 # Test binary, built with `go test -c`
 *.test
 

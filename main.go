@@ -22,7 +22,7 @@ type logr struct {
 
 var (
 	dRecs   logr
-	limit   = 600 * time.Millisecond
+	limit   = 700 * time.Millisecond
 	records [][]record
 )
 
@@ -46,8 +46,8 @@ func main() {
 	// Start up http server
 	go Server()
 
-	// Create a ticker that ticks every 5 minutes
-	ticker := time.NewTicker(5 * time.Minute)
+	// Create a ticker that ticks every minute
+	ticker := time.NewTicker(1 * time.Minute)
 
 	for {
 		var r []record
@@ -56,6 +56,7 @@ func main() {
 		_, err := client.Get(server)
 		if err != nil {
 			if e, ok := err.(net.Error); ok && e.Timeout() {
+				log.Println(err)
 				timeOutCount++
 			} else {
 				log.Println("ERROR:", err)
@@ -70,7 +71,10 @@ func main() {
 			})
 		tRec = append(tRec, uint16(latency.Milliseconds()))
 		if timeOutCount == 5 {
-			alertOnTimeouts(tRec[len(tRec)-5:])
+			err := alertOnTimeouts(tRec[len(tRec)-5:])
+			if err != nil {
+				log.Fatal(err)
+			}
 			// Reset values
 			tRec = []uint16{}
 			timeOutCount = 0
@@ -90,10 +94,11 @@ func main() {
 			clearRecords()
 		default:
 		}
+		time.Sleep(1 * time.Second)
 	}
 }
 
-func alertOnTimeouts(timeOuts []uint16) {
+func alertOnTimeouts(timeOuts []uint16) error {
 	fmt.Println(timeOuts)
 	averageTimeout := avgLatency(timeOuts)
 	fmt.Println(averageTimeout)
@@ -101,6 +106,11 @@ func alertOnTimeouts(timeOuts []uint16) {
 	if averageTimeout >= uint16(limit) || averageTimeout <= uint16(limit)+1 {
 		fmt.Println("Average of 3 timeouts reached 800!")
 	}
+	err := sendMail()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func avgLatency(l []uint16) uint16 {
