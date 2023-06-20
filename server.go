@@ -37,6 +37,6 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 func Server() {
 	http.HandleFunc("/logs", getLogs)
 	http.HandleFunc("/", displayGraph)
-	log.Println("Server running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server running on :8000")
+	log.Fatal(http.ListenAndServe(":8000", nil))
 }

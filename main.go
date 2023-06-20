@@ -35,12 +35,19 @@ func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
 	server := "8.8.8.8"
+	timeOutCount := 0
 
 	// Start up http server
 	go Server()
 
 	// Create a ticker that ticks every minute
 	ticker := time.NewTicker(5 * time.Minute)
+
+	ip := getIP()
+	err := serverLocMail(ip)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for {
 		var r []record
@@ -49,28 +56,31 @@ func main() {
 		if err != nil {
 			log.Fatal("PINGER INITIALIZATION ERR: ", err)
 		}
+
+		// WINDOWS PRIVILEDGES
+		// pinger.SetPrivileged(true)
+
 		pinger.Timeout = 500 * time.Millisecond
 
 		start := time.Now()
 		err = pinger.Run()
 		if err != nil {
-			if err := sendMail(); err != nil {
-				log.Fatal(err)
-			}
+			/* if err := sendMail(); err != nil {
+				log.Println(err)
+			} */
 			log.Println("PINGER ERR: ", err)
 		}
-		// results from the 5 pings
+
+		// ping results
 		stats := pinger.Statistics()
-		// fmt.Printf("%+v\n\n", *stats)
 		latency := stats.AvgRtt
-		timeOutCount := 0
-		if stats.PacketLoss > 40 {
+		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 300 {
 			timeOutCount++
 		}
 
-		// only send alert if more than 10 timeouts have occurred
-		if timeOutCount == 10 {
-			err := sendMail()
+		// only send alert if more than 5 timeouts have occurred
+		if timeOutCount >= 3 {
+			err := possibleDowntimeMail()
 			if err != nil {
 				log.Println(err)
 			}

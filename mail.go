@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func sendMail() error {
+func possibleDowntimeMail() error {
 	data, err := getDets()
 	if err != nil {
 		return err
@@ -43,6 +43,35 @@ The Superior NetMon`
 	}
 
 	log.Println("L1 NOTIFIED")
+	return nil
+}
+
+func serverLocMail(ip string) error {
+	data, err := getDets()
+	if err != nil {
+		return err
+	}
+	from := data[0]
+	password := data[1]
+
+	// Recipient email address
+	to := []string{"musaubrian45@gmail.com"}
+
+	// SMTP server details
+	smtpHost := "smtp.gmail.com"
+	smtpAddr := smtpHost + ":587"
+	msg := "Greetings, mortal!\r\nI am located at http://" + ip + ":8000\r\n\n" + "I'll be on the lookout\r\n" + "\r\n\nSigned,\r\nThe Superior NetMon"
+	email := []byte("To:" + to[0] + "\r\n" + "Subject: Server location\r\n" +
+		"\r\n" +
+		msg)
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	err = smtp.SendMail(smtpAddr, auth, from, to, email)
+	if err != nil {
+		return err
+	}
+
+	log.Println("SERVER LOCATION SHARED")
 	return nil
 }
 
