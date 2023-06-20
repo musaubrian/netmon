@@ -25,7 +25,7 @@ func sendMail() error {
 	msg := `Greetings, mortal!
 
 There has been a worrisome development within our domain. The latencies have soared to unprecedented heights, threatening our network's very existence. 
-Summon your expertise and investigate this matter with utmost urgency.
+Summon your expertise and investigate this matter with utmost urgency. It could just be a fluke or it could be the start of something that's not good
 
 The fate of our network lays in your hands.
 

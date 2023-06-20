@@ -47,9 +47,8 @@ func main() {
 		// initializa new pinger
 		pinger, err := probing.NewPinger(server)
 		if err != nil {
-            log.Fatal("PINGER INITIALIZATION ERR: ",err)
+			log.Fatal("PINGER INITIALIZATION ERR: ", err)
 		}
-        pinger.Count = 5
 		pinger.Timeout = 500 * time.Millisecond
 
 		start := time.Now()
@@ -64,11 +63,18 @@ func main() {
 		stats := pinger.Statistics()
 		// fmt.Printf("%+v\n\n", *stats)
 		latency := stats.AvgRtt
-		if stats.PacketLoss > 25 {
+		timeOutCount := 0
+		if stats.PacketLoss > 40 {
+			timeOutCount++
+		}
+
+		// only send alert if more than 10 timeouts have occurred
+		if timeOutCount == 10 {
 			err := sendMail()
 			if err != nil {
 				log.Println(err)
 			}
+			timeOutCount = 0
 		}
 
 		r = append(r,
