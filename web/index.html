@@ -35,7 +35,7 @@
   <script>
     const h1 = document.getElementById("h1");
     const h2 = document.getElementById("h2");
-
+    let mx;
     function fetchLogs() {
       return fetch("/logs")
         .then((response) => response.json())
@@ -51,6 +51,9 @@
           for (let i = startLoopIndex; i < records.length; i++) {
             let record = records[i];
             for (let j = 0; j < record.length; j++) {
+              if (record[j].latency > 20) {
+                mx = record[j].latency + 100;
+              }
               newxValues.push(record[j].start);
               newyValues.push(record[j].latency);
             }
@@ -102,7 +105,7 @@
           ],
           yAxes: [
             {
-              ticks: { min: 1, max: 50 },
+              ticks: { min: 1, max: mx },
               scaleLabel: {
                 display: true,
                 labelString: "Time to respond (milliseconds)",
@@ -116,6 +119,6 @@
     //initial fetch
     fetchLogs();
     // the rest
-    setInterval(fetchLogs, 60*1000);
+    setInterval(fetchLogs, 60 * 1000);
   </script>
 </html>
