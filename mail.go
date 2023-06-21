@@ -9,19 +9,9 @@ import (
 )
 
 func possibleDowntimeMail() error {
-	data, err := getDets()
-	if err != nil {
-		return err
-	}
-	from := data[0]
-	password := data[1]
-
-	// Recipient email address
+	// Recipient email address(es)
 	to := []string{"musaubrian45@gmail.com"}
 
-	// SMTP server details
-	smtpHost := "smtp.gmail.com"
-	smtpAddr := smtpHost + ":587"
 	msg := `Greetings, mortal!
 
 There has been a worrisome development within our domain. The latencies have soared to unprecedented heights, threatening our network's very existence. 
@@ -30,23 +20,43 @@ Summon your expertise and investigate this matter with utmost urgency. It could 
 The fate of our network lays in your hands.
 
 Signed,
-The Superior NetMon`
+netmon`
 
-	email := []byte("To:" + to[0] + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
-		"\r\n" +
-		msg)
+	for _, recipient := range to {
+		email := []byte("To:" + recipient + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
+			"\r\n" +
+			msg)
 
-	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err = smtp.SendMail(smtpAddr, auth, from, to, email)
-	if err != nil {
-		return err
+		err := sendMail(recipient, email)
+		if err != nil {
+			return err
+		}
 	}
-
 	log.Println("L1 NOTIFIED")
 	return nil
 }
 
 func serverLocMail(ip string) error {
+	to := []string{"musaubrian45@gmail.com"}
+
+	for _, recipient := range to {
+
+		msg := "Greetings,\r\nI'm up and running at " + ip +
+			":8000\r\n" + "I'll notify you if something doesn't seem right\r\n" +
+			"\r\nSigned,\r\nnetmon"
+
+		email := []byte("To:" + recipient + "\r\nSubject: Server location\r\n" + "\r\n" + msg)
+		err := sendMail(recipient, email)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("SERVER LOCATION SHARED")
+	return nil
+}
+
+func sendMail(to string, msg []byte) error {
 	data, err := getDets()
 	if err != nil {
 		return err
@@ -54,24 +64,15 @@ func serverLocMail(ip string) error {
 	from := data[0]
 	password := data[1]
 
-	// Recipient email address
-	to := []string{"musaubrian45@gmail.com"}
-
-	// SMTP server details
 	smtpHost := "smtp.gmail.com"
 	smtpAddr := smtpHost + ":587"
-	msg := "Greetings, mortal!\r\nI am located at http://" + ip + ":8000\r\n\n" + "I'll be on the lookout\r\n" + "\r\n\nSigned,\r\nThe Superior NetMon"
-	email := []byte("To:" + to[0] + "\r\n" + "Subject: Server location\r\n" +
-		"\r\n" +
-		msg)
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err = smtp.SendMail(smtpAddr, auth, from, to, email)
+	err = smtp.SendMail(smtpAddr, auth, from, []string{to}, msg)
 	if err != nil {
 		return err
 	}
 
-	log.Println("SERVER LOCATION SHARED")
 	return nil
 }
 
