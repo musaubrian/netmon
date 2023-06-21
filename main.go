@@ -24,13 +24,6 @@ var (
 	records [][]record
 )
 
-func minimalDate(d string) string {
-	var f string
-	u := strings.Split(d, " ")
-	f = u[0] + " " + u[1]
-	return f
-}
-
 func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
@@ -65,9 +58,6 @@ func main() {
 		start := time.Now()
 		err = pinger.Run()
 		if err != nil {
-			/* if err := sendMail(); err != nil {
-				log.Println(err)
-			} */
 			log.Println("PINGER ERR: ", err)
 		}
 
@@ -109,6 +99,13 @@ func main() {
 		time.Sleep(1 * time.Second)
 
 	}
+}
+
+func minimalDate(d string) string {
+	var f string
+	u := strings.Split(d, " ")
+	f = u[0] + " " + u[1]
+	return f
 }
 
 func clearRecords() {

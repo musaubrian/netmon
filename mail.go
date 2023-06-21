@@ -36,16 +36,23 @@ netmon`
 	return nil
 }
 
+/*
+Send the server's host IP to concerned parties.
+
+Ideally should only ever happen once when the program is launched
+*/
 func serverLocMail(ip string) error {
 	to := []string{"musaubrian45@gmail.com"}
 
 	for _, recipient := range to {
 
 		msg := "Greetings,\r\nI'm up and running at " + ip +
-			":8000\r\n" + "I'll notify you if something doesn't seem right\r\n" +
+			":8000\r\n" +
+			"I'll notify you if something doesn't seem right\r\n" +
 			"\r\nSigned,\r\nnetmon"
 
-		email := []byte("To:" + recipient + "\r\nSubject: Server location\r\n" + "\r\n" + msg)
+		email := []byte("To:" + recipient +
+			"\r\nSubject: Server location\r\n" + "\r\n" + msg)
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
