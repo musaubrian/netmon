@@ -9,20 +9,17 @@ import (
 )
 
 func possibleDowntimeMail() error {
-	// Recipient email address(es)
-	to := []string{"musaubrian45@gmail.com"}
+	// Recipient(s) email address(es)
+	recipients := []string{"musaubrian45@gmail.com"}
 
-	msg := `Greetings, mortal!
+	msg := `Houston we have a problem!
 
 There has been a worrisome development within our domain. The latencies have soared to unprecedented heights, threatening our network's very existence. 
-Summon your expertise and investigate this matter with utmost urgency. It could just be a fluke or it could be the start of something that's not good
+You must identify the elusive root cause to restore order. It could just be a fluke or it could be the start of something that's not good
 
-The fate of our network lays in your hands.
+netmon signing off`
 
-Signed,
-netmon`
-
-	for _, recipient := range to {
+	for _, recipient := range recipients {
 		email := []byte("To:" + recipient + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
 			"\r\n" +
 			msg)
@@ -42,9 +39,9 @@ Send the server's host IP to concerned parties.
 Ideally should only ever happen once when the program is launched
 */
 func serverLocMail(ip string) error {
-	to := []string{"musaubrian45@gmail.com"}
+	recipients := []string{"musaubrian45@gmail.com"}
 
-	for _, recipient := range to {
+	for _, recipient := range recipients {
 
 		msg := "Greetings,\r\nI'm up and running at " + ip +
 			":8000\r\n" +

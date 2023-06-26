@@ -64,7 +64,7 @@ func main() {
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
-		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 300 {
+		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 600 {
 			timeOutCount++
 		}
 
@@ -101,6 +101,7 @@ func main() {
 	}
 }
 
+// Format date to: `day, date-month-year`
 func minimalDate(d string) string {
 	var f string
 	u := strings.Split(d, " ")
