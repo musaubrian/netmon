@@ -8,11 +8,11 @@ BIN_LOC := $(BIN_DIR)/$(BIN)
 
 build:
 	@mkdir -p ./bin
-	$(GO) build -o $(BIN_LOC) $(SRC)
+	@$(GO) build -o $(BIN_LOC) $(SRC)
 
 start:build
-	$(BIN_LOC)
+	@$(BIN_LOC)
 
 clean:
 	@rm -r $(BIN_DIR)
-	@echo "Removed `./bin` directory"
+	@echo "Removed './bin' directory"
