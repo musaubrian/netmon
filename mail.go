@@ -14,10 +14,11 @@ func possibleDowntimeMail() error {
 
 	msg := `Houston we have a problem!
 
-There has been a worrisome development within our domain. The latencies have soared to unprecedented heights, threatening our network's very existence. 
-You must identify the elusive root cause to restore order. It could just be a fluke or it could be the start of something that's not good
+There has been a worrisome development within our domain.
+Latencies have soared to unprecedented heights, threatening our network's very existence. 
+You must identify the elusive root cause to restore order.
 
-netmon signing off`
+Netmon signing off`
 
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
@@ -46,7 +47,7 @@ func serverLocMail(ip string) error {
 		msg := "Greetings,\r\nI'm up and running at " + ip +
 			":8000\r\n" +
 			"I'll notify you if something doesn't seem right\r\n" +
-			"\r\nSigned,\r\nnetmon"
+			"\r\nNetmon signing off"
 
 		email := []byte("To:" + recipient +
 			"\r\nSubject: Server location\r\n" + "\r\n" + msg)

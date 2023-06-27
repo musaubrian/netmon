@@ -64,7 +64,7 @@ func main() {
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
-		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 600 {
+		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 500 {
 			timeOutCount++
 		}
 
