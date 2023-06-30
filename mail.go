@@ -10,7 +10,7 @@ import (
 
 func possibleDowntimeMail() error {
 	// Recipient(s) email address(es)
-	recipients := []string{"musaubrian45@gmail.com"}
+	recipients := getEmails()
 
 	msg := `Houston we have a problem!
 
@@ -40,7 +40,7 @@ Send the server's host IP to concerned parties.
 Ideally should only ever happen once when the program is launched
 */
 func serverLocMail(ip string) error {
-	recipients := []string{"musaubrian45@gmail.com"}
+	recipients := getEmails()
 
 	for _, recipient := range recipients {
 
