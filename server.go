@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -35,8 +36,9 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func Server() {
+	port := fmt.Sprintf(":%d", getPort())
 	http.HandleFunc("/logs", getLogs)
 	http.HandleFunc("/", displayGraph)
-	log.Println("Server running on :8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Printf("Server running on %s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }

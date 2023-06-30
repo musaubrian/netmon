@@ -28,7 +28,7 @@ var (
 func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
-	server := "8.8.8.8"
+	server := getServerToPing()
 	timeOutCount := 0
 
 	// Start up http server
@@ -67,8 +67,12 @@ func main() {
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
-		if stats.PacketLoss > 50 || int(latency.Milliseconds()) >= 500 {
-			timeOutCount++
+		if int(latency.Milliseconds()) >= 500 {
+			if stats.PacketLoss > 50 {
+				timeOutCount++
+			} else {
+				timeOutCount++
+			}
 		}
 
 		// only send alert if more than 5 timeouts have occurred
@@ -103,7 +107,7 @@ func main() {
 			clearRecords()
 		default:
 		}
-		// time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 
 	}
 }
