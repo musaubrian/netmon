@@ -28,7 +28,7 @@ var (
 func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
-	server := getServerToPing()
+	server := "8.8.8.8"
 	timeOutCount := 0
 
 	// Start up http server

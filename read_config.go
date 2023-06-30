@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Load the config.yaml file and update the config values change
 func loadConfig() {
 	viper.SetConfigFile("config.yaml")
 	viper.SetConfigType("yaml")
@@ -14,6 +15,7 @@ func loadConfig() {
 		log.Fatal("CONFIG ERR: ", err,
 			"\n\nCopy `config.example.yaml` to `config.yaml`\nAnd adjust `config.yaml` to your liking")
 	}
+	viper.WatchConfig()
 }
 
 func getServerToPing() string {
