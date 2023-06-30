@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"runtime"
 	"strings"
 	"time"
 
@@ -50,8 +51,10 @@ func main() {
 			log.Fatal("PINGER INITIALIZATION ERR: ", err)
 		}
 
-		// WINDOWS PRIVILEDGES
-		// pinger.SetPrivileged(true)
+		// WINDOWS PRIVILEGES
+		if runtime.GOOS == "windows" {
+			pinger.SetPrivileged(true)
+		}
 
 		pinger.Timeout = 500 * time.Millisecond
 
@@ -64,17 +67,21 @@ func main() {
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
-		if stats.PacketLoss > 40 || int(latency.Milliseconds()) >= 500 {
+		if stats.PacketLoss > 50 || int(latency.Milliseconds()) >= 500 {
 			timeOutCount++
 		}
 
 		// only send alert if more than 5 timeouts have occurred
 		if timeOutCount >= 3 {
+			timeOutCount = 0
 			err := possibleDowntimeMail()
 			if err != nil {
 				log.Println(err)
 			}
-			timeOutCount = 0
+			// Sleep for 30 minutes after alerting
+			// You have 30 minutes max to find the solution to the issue
+			// before it continues
+			time.Sleep(30 * time.Minute)
 		}
 
 		r = append(r,
@@ -96,7 +103,7 @@ func main() {
 			clearRecords()
 		default:
 		}
-		time.Sleep(1 * time.Second)
+		// time.Sleep(1 * time.Second)
 
 	}
 }
