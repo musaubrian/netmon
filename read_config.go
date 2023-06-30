@@ -6,14 +6,14 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Load the config.yaml file and update the config values change
+// Load the config.yml file and update the config values change
 func loadConfig() {
-	viper.SetConfigFile("config.yaml")
+	viper.SetConfigFile("config.yml")
 	viper.SetConfigType("yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal("CONFIG ERR: ", err,
-			"\n\nCopy `config.example.yaml` to `config.yaml`\nAnd adjust `config.yaml` to your liking")
+			"\n\nCopy `config.example.yml` to `config.yml`\nAnd adjust `config.yml` to your liking")
 	}
 	viper.WatchConfig()
 }

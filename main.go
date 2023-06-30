@@ -82,10 +82,10 @@ func main() {
 			if err != nil {
 				log.Println(err)
 			}
-			// Sleep for 30 minutes after alerting
-			// You have 30 minutes max to find the solution to the issue
+			// Sleep for 10 minutes after alerting
+			// You have 10 minutes max to find the solution to the issue
 			// before it continues
-			time.Sleep(30 * time.Minute)
+			time.Sleep(10 * time.Minute)
 		}
 
 		r = append(r,
