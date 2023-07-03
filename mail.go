@@ -6,9 +6,17 @@ import (
 	"os"
 )
 
+type ServerLocation struct {
+	URL string
+}
+type PossibleDowntimeNot struct {
+	//
+}
+
 func possibleDowntimeMail() error {
 	// Recipient(s) email address(es)
 	recipients := getEmails()
+	mime := "Content-Type: text/html; charset=utf-8\r\n"
 
 	msg := `Houston we have a problem!
 
@@ -20,7 +28,7 @@ Netmon signing off`
 
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
-			"\r\n" +
+			mime +
 			msg)
 
 		err := sendMail(recipient, email)
@@ -37,17 +45,21 @@ Send the server's host IP to concerned parties.
 
 Ideally should only ever happen once when the program is launched
 */
-func serverLocMail(ip string) error {
+func serverLocMail(uri string) error {
 	recipients := getEmails()
+	loc := &ServerLocation{
+		URL: uri,
+	}
 
+	body, err := serverLocTempl(*loc)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	for _, recipient := range recipients {
-
-		msg := "Greetings,\r\nI'm up and running at " + ip +
-			"\r\nI'll notify you if something doesn't seem right\r\n" +
-			"\r\nNetmon signing off"
-
 		email := []byte("To:" + recipient +
-			"\r\nSubject: Server location\r\n" + "\r\n" + msg)
+			"\r\nSubject: Server location\r\n" + mime + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err

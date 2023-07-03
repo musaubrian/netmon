@@ -31,7 +31,9 @@ func main() {
 	if err := loadEnv(); err != nil {
 		log.Fatal(err)
 	}
-	loadConfig()
+	if err := loadConfig(); err != nil {
+		log.Fatal(err)
+	}
 
 	ctx := context.Background()
 	today := time.Now()
@@ -118,7 +120,7 @@ func main() {
 		default:
 		}
 
-		time.Sleep(500 * time.Millisecond)
+		// time.Sleep(500 * time.Millisecond)
 	}
 }
 

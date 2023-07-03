@@ -1,21 +1,24 @@
 package main
 
 import (
-	"log"
+	"errors"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
 
 // Load the config.yml file and watch it for any updates
-func loadConfig() {
+func loadConfig() error {
 	viper.SetConfigFile("config.yml")
 	viper.SetConfigType("yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("CONFIG ERR: ", err,
-			"\n\nCopy `config.example.yml` to `config.yml`\nAnd adjust `config.yml` to your liking")
+		newErr := fmt.Sprintf(
+			"CONFIG ERR: %v\n\nCopy `config.example.yml` to `config.yml`\nAnd adjust `config.yml` to your liking", err)
+		return errors.New(newErr)
 	}
 	viper.WatchConfig()
+	return nil
 }
 
 func getServerToPing() string {
