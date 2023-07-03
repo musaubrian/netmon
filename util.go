@@ -1,20 +1,16 @@
 package main
 
 import (
-	"log"
-	"net"
-	"strings"
+	"errors"
+
+	"github.com/joho/godotenv"
 )
 
-func getIP() string {
-	c, err := net.Dial("udp", "8.8.8.8:80")
+func loadEnv() error {
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		return errors.New("COULD NOT LOAD .env\nRENAME `.env.example` to `.env` AND ADJUST THE CONTENTS")
 	}
-	defer c.Close()
 
-	unFormattedIP := c.LocalAddr()
-	ip := strings.Split(unFormattedIP.String(), ":")
-
-	return ip[0]
+	return nil
 }

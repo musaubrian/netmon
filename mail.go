@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"errors"
 	"log"
 	"net/smtp"
 	"os"
@@ -45,8 +43,7 @@ func serverLocMail(ip string) error {
 	for _, recipient := range recipients {
 
 		msg := "Greetings,\r\nI'm up and running at " + ip +
-			":8000\r\n" +
-			"I'll notify you if something doesn't seem right\r\n" +
+			"\r\nI'll notify you if something doesn't seem right\r\n" +
 			"\r\nNetmon signing off"
 
 		email := []byte("To:" + recipient +
@@ -62,37 +59,17 @@ func serverLocMail(ip string) error {
 }
 
 func sendMail(to string, msg []byte) error {
-	data, err := getDets()
-	if err != nil {
-		return err
-	}
-	from := data[0]
-	password := data[1]
+	from := os.Getenv("email")
+	password := os.Getenv("pwd")
 
 	smtpHost := "smtp.gmail.com"
 	smtpAddr := smtpHost + ":587"
 
 	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err = smtp.SendMail(smtpAddr, auth, from, []string{to}, msg)
+	err := smtp.SendMail(smtpAddr, auth, from, []string{to}, msg)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func getDets() ([]string, error) {
-	var dets []string
-
-	f, err := os.Open(".env")
-	if err != nil {
-		return dets, errors.Join(errors.New("COULD NOT OPEN FILE.\n"), err)
-	}
-	sc := bufio.NewScanner(f)
-
-	for sc.Scan() {
-		dets = append(dets, sc.Text())
-	}
-
-	return dets, nil
 }

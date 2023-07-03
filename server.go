@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"golang.ngrok.com/ngrok"
+	"golang.ngrok.com/ngrok/config"
 )
 
 func getLogs(w http.ResponseWriter, r *http.Request) {
@@ -35,10 +38,22 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Server() {
-	port := fmt.Sprintf(":%d", getPort())
-	http.HandleFunc("/logs", getLogs)
-	http.HandleFunc("/", displayGraph)
-	log.Printf("Server running on %s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+func Server(ctx context.Context, tunn ngrok.Tunnel) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/logs", getLogs)
+	mux.HandleFunc("/", displayGraph)
+
+	log.Println("TUNNEL CREATED AT:", tunn.URL())
+	log.Fatal(http.Serve(tunn, mux))
+}
+
+// extract NGROK initialization to function
+// So as I can access the URL [tunn.URL()]
+func createNgrokListener(ctx context.Context, token string) (ngrok.Tunnel, error) {
+	tunn, err := ngrok.Listen(
+		ctx,
+		config.HTTPEndpoint(),
+		ngrok.WithAuthtoken(token),
+	)
+	return tunn, err
 }

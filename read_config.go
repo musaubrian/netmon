@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Load the config.yml file and update the config values change
+// Load the config.yml file and watch it for any updates
 func loadConfig() {
 	viper.SetConfigFile("config.yml")
 	viper.SetConfigType("yaml")
@@ -19,16 +19,13 @@ func loadConfig() {
 }
 
 func getServerToPing() string {
-	loadConfig()
 	return viper.GetString("server.server_to_ping")
 }
 
 func getPort() int {
-	loadConfig()
 	return viper.GetInt("server.web_server_port")
 }
 
 func getEmails() []string {
-	loadConfig()
 	return viper.GetStringSlice("emails")
 }

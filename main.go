@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"log"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -26,20 +28,30 @@ var (
 )
 
 func main() {
+	if err := loadEnv(); err != nil {
+		log.Fatal(err)
+	}
+	loadConfig()
+
+	ctx := context.Background()
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
 	server := getServerToPing()
 	timeOutCount := 0
 
-	// Start up http server
-	go Server()
-
 	// Create a ticker that ticks every minute
 	ticker := time.NewTicker(5 * time.Minute)
 
-	ip := getIP()
-	err := serverLocMail(ip)
+	ngrok_token := os.Getenv("ngrok_token")
+
+	tunn, err := createNgrokListener(ctx, ngrok_token)
 	if err != nil {
+		log.Fatal(err)
+	}
+	// Start up http server
+	go Server(ctx, tunn)
+
+	if err := serverLocMail(tunn.URL()); err != nil {
 		log.Fatal(err)
 	}
 
@@ -67,15 +79,12 @@ func main() {
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
+
 		if int(latency.Milliseconds()) >= 500 {
-			if stats.PacketLoss > 50 {
-				timeOutCount++
-			} else {
-				timeOutCount++
-			}
+			timeOutCount++
 		}
 
-		// only send alert if more than 5 timeouts have occurred
+		// only send alert if more than 3 timeouts have occurred
 		if timeOutCount >= 3 {
 			timeOutCount = 0
 			err := possibleDowntimeMail()
@@ -90,7 +99,8 @@ func main() {
 
 		r = append(r,
 			record{
-				Start: start, Latency: uint16(latency.Milliseconds()),
+				Start:   start,
+				Latency: uint16(latency.Milliseconds()),
 			})
 
 		records = append(records, r)
@@ -107,8 +117,8 @@ func main() {
 			clearRecords()
 		default:
 		}
-		time.Sleep(500 * time.Millisecond)
 
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 
