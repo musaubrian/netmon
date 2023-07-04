@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -13,4 +14,12 @@ func loadEnv() error {
 	}
 
 	return nil
+}
+
+// Format date to: `day, date-month-year`
+func minimalDate(d string) string {
+	var f string
+	u := strings.Split(d, " ")
+	f = u[0] + " " + u[1]
+	return f
 }

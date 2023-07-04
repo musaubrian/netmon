@@ -21,3 +21,4 @@ _*
 # Go workspace file
 go.work
 config.yml
+logs/

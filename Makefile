@@ -8,6 +8,7 @@ BIN_LOC := $(BIN_DIR)/$(BIN)
 
 build:
 	@mkdir -p ./bin
+	@mkdir -p ./logs
 	@$(GO) build -o $(BIN_LOC) $(SRC)
 
 start:build

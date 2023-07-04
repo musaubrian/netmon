@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	probing "github.com/prometheus-community/pro-bing"
@@ -29,9 +28,11 @@ var (
 
 func main() {
 	if err := loadEnv(); err != nil {
+		WriteFatalErrs(err.Error())
 		log.Fatal(err)
 	}
 	if err := loadConfig(); err != nil {
+		WriteFatalErrs(err.Error())
 		log.Fatal(err)
 	}
 
@@ -49,12 +50,14 @@ func main() {
 
 	tunn, err := createNgrokListener(ctx, ngrok_token)
 	if err != nil {
+		WriteFatalErrs(err.Error())
 		log.Fatal(err)
 	}
 	// Start up http server
 	go Server(ctx, tunn)
 
 	if err := serverLocMail(tunn.URL()); err != nil {
+		WriteFatalErrs(err.Error())
 		log.Fatal(err)
 	}
 
@@ -90,6 +93,11 @@ func main() {
 		// only send alert if more than 3 timeouts have occurred
 		if timeOutCount >= 3 {
 			timeOutCount = 0
+			// Write the
+			if err := WriteLatenciesLog(); err != nil {
+				WriteFatalErrs(err.Error())
+				log.Fatal(err)
+			}
 			err := possibleDowntimeMail()
 			if err != nil {
 				log.Println(err)
@@ -125,29 +133,6 @@ func main() {
 	}
 }
 
-// Format date to: `day, date-month-year`
-func minimalDate(d string) string {
-	var f string
-	u := strings.Split(d, " ")
-	f = u[0] + " " + u[1]
-	return f
-}
-
 func clearRecords() {
 	records = [][]record{}
 }
-
-/*func createLog(fName string, d logr) error {
-	f, err := os.OpenFile(fName, os.O_WRONLY|os.O_CREATE, 0o660)
-	if err != nil {
-		return errors.Join(errors.New("COULD NOT CREATE FILE:"), err)
-	}
-	defer f.Close()
-	jsonData, err := json.Marshal(d)
-	if err != nil {
-		return errors.Join(errors.New("MARSHALLING FAILED:"), err)
-	}
-	f.WriteString(string(jsonData))
-	fmt.Println("File written to")
-	return nil
-}*/
