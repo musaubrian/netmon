@@ -4,7 +4,7 @@ BIN := _netmon
 BIN_DIR := ./bin
 BIN_LOC := $(BIN_DIR)/$(BIN)
 
-.PHONY: build clean start
+.PHONY: build clean start test
 
 build:
 	@mkdir -p ./bin
@@ -12,6 +12,9 @@ build:
 
 start:build
 	@$(BIN_LOC)
+	
+test:
+	@go test -v ./... 
 
 clean:
 	@rm -r $(BIN_DIR)

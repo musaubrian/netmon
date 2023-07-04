@@ -9,9 +9,6 @@ import (
 type ServerLocation struct {
 	URL string
 }
-type PossibleDowntimeNot struct {
-	//
-}
 
 func possibleDowntimeMail() error {
 	// Recipient(s) email address(es)
@@ -51,7 +48,7 @@ func serverLocMail(uri string) error {
 		URL: uri,
 	}
 
-	body, err := serverLocTempl(*loc)
+	body, err := serverLocTempl(loc)
 	if err != nil {
 		log.Fatal(err)
 	}
