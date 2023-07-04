@@ -11,7 +11,7 @@ func WriteFatalErrs(e string) {
 	t := time.Now()
 	// add a new line to the result
 	c := createLogErr(e, t)
-    content := c + "\n---\n\n"
+	content := c + "\n---\n\n"
 	f, err := os.OpenFile("./logs/fatal", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
 	if err != nil {
 		log.Fatal(err)
@@ -36,12 +36,12 @@ func WriteLatenciesLog() error {
 func createLogErr(err string, t time.Time) string {
 	var logErr string
 
-	cleanTime := prefixTime(t)
+	cleanTime := formatTime(t)
 	logErr = cleanTime + " " + err
 	return logErr
 }
 
-func prefixTime(t time.Time) string {
+func formatTime(t time.Time) string {
 	formattedTime := t.Format(time.DateTime)
 	return formattedTime
 }
