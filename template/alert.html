@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      .inner {
+        width: 65%;
+      }
+
+      @media screen and (max-width: 800px) {
+        .inner {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        padding: 1rem;
+      "
+    >
+      <div
+        class="inner"
+        style="
+          border-radius: 15px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          background-color: #f1f5f9;
+          overflow-y: hidden;
+        "
+      >
+        <div style="width: 100%; display: block; text-align: center">
+          <div
+            style="
+              background-color: #e2e8f0;
+              padding: 1rem;
+              box-shadow: 10px, 10px, 10px, 20px, #f59e0b;
+            "
+          >
+            <span style="width: 100%; display: inline-flex; padding: 0.5rem">
+              <!-- <span style="font-size: 1.8rem; margin-right: 1rem; width: 20%" -->
+              <!--   >&#x1F534;</span -->
+            </span>
+            <h1 style="font-size: 1.8rem; margin: 0; text-align: center">
+              High Latencies detected
+            </h1>
+          </div>
+
+          <p style="font-size: 1.05rem; padding: 1rem; text-align: start">
+            {{.Message}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

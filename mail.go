@@ -10,24 +10,28 @@ type ServerLocation struct {
 	URL string
 }
 
+type Alert struct {
+	Message string
+}
+
 func possibleDowntimeMail() error {
 	// Recipient(s) email address(es)
 	recipients := getEmails()
+	msg := getAlertMsg()
+
+	message := &Alert{
+		Message: msg,
+	}
+
 	mime := "Content-Type: text/html; charset=utf-8\r\n"
-
-	msg := `Houston we have a problem!
-
-There has been a worrisome development within our domain.
-Latencies have soared to unprecedented heights, threatening our network's very existence. 
-You must identify the elusive root cause to restore order.
-
-Netmon signing off`
-
+	body, err := alertMailTempl(message)
+	if err != nil {
+		return err
+	}
 	for _, recipient := range recipients {
-		email := []byte("To:" + recipient + "\r\n" + "Subject: Latency Anomaly - Requesting Investigation\r\n" +
-			mime +
-			msg)
-
+		email := []byte("To:" + recipient +
+			"\r\nSubject: 🚨 Latency Anomaly - Requesting Investigation\r\n" +
+			mime + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
@@ -38,7 +42,7 @@ Netmon signing off`
 }
 
 /*
-Send the server's host IP to concerned parties.
+Send the server's location to concerned parties.
 
 Ideally should only ever happen once when the program is launched
 */

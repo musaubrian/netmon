@@ -2,9 +2,21 @@
 server:
   server_to_ping: 8.8.8.8
   web_server_port: 8000
+  # The maximum latency you expect to experience or as the ISP states
+  # In milliseconds
+  max_latency: 500
 
 # People to notify
 emails:
   - user@domain.com
   - user@domain.com
   - user@domain.com
+
+alert:
+  # The alert message to be notify the concerned parties
+  # of a possible downtime
+  # Stay within the #
+  message: |
+    #___________
+    #___________
+    #___________

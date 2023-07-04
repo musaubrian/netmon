@@ -32,3 +32,11 @@ func getPort() int {
 func getEmails() []string {
 	return viper.GetStringSlice("emails")
 }
+
+func getMaxLat() int {
+	return viper.GetInt("server.max_latency")
+}
+
+func getAlertMsg() string {
+	return viper.GetString("alert.message")
+}

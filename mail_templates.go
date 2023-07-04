@@ -13,9 +13,18 @@ func serverLocTempl(loc *ServerLocation) (bytes.Buffer, error) {
 		return templContents, err
 	}
 	err = templ.Execute(&templContents, loc)
+
+	return templContents, nil
+}
+
+func alertMailTempl(alert *Alert) (bytes.Buffer, error) {
+	var templContents bytes.Buffer
+
+	templ, err := template.ParseFiles("./template/alert.html")
 	if err != nil {
 		return templContents, err
 	}
+	err = templ.Execute(&templContents, alert)
 
-	return templContents, nil
+	return templContents, err
 }

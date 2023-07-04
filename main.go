@@ -39,6 +39,7 @@ func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
 	server := getServerToPing()
+	maxLatency := getMaxLat()
 	timeOutCount := 0
 
 	// Create a ticker that ticks every minute
@@ -82,7 +83,7 @@ func main() {
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
 
-		if int(latency.Milliseconds()) >= 500 {
+		if int(latency.Milliseconds()) >= maxLatency {
 			timeOutCount++
 		}
 

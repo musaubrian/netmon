@@ -20,3 +20,18 @@ func TestServerLocTempl(t *testing.T) {
 		t.Errorf("Expected [%s] in template", expected)
 	}
 }
+
+func TestAlertMailTempl(t *testing.T) {
+	alert := &Alert{
+		Message: "This is an alert Message",
+	}
+
+	res, err := alertMailTempl(alert)
+	if err != nil {
+		t.Errorf("Expected nil got %v", err)
+	}
+
+	if !strings.Contains(res.String(), alert.Message) {
+		t.Errorf("Expected [%s] to be in template", alert.Message)
+	}
+}
