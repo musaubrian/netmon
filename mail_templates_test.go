@@ -17,13 +17,13 @@ func TestServerLocTempl(t *testing.T) {
 	str := got.String()
 	expected := "Service Location"
 	if !strings.Contains(str, expected) {
-		t.Errorf("Expected [%s] in template", expected)
+		t.Errorf("Expected [%s] in template, %s", expected, str)
 	}
 }
 
 func TestAlertMailTempl(t *testing.T) {
 	alert := &Alert{
-		Message: "This is an alert Message",
+		Message: getAlertMsg(),
 	}
 
 	res, err := alertMailTempl(alert)

@@ -7,6 +7,18 @@ import (
 	"time"
 )
 
+func WriteNetworkDownErrs(e string, t time.Time) {
+	c := createLogErr(e, t)
+	content := c + "\n"
+
+	f, err := os.OpenFile("./logs/network_down", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	f.WriteString(content)
+}
+
 func WriteFatalErrs(e string) {
 	t := time.Now()
 	// add a new line to the result

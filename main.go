@@ -10,6 +10,18 @@ import (
 	probing "github.com/prometheus-community/pro-bing"
 )
 
+type NetMonConf struct {
+	// For authentication
+	Email string
+	Pwd   string
+
+	S          string
+	Port       int
+	Recipients []string
+	MaxLat     int
+	AlertMsg   string
+}
+
 type record struct {
 	Start   time.Time `json:"start"`
 	Latency uint16    `json:"latency"`
@@ -24,6 +36,7 @@ type logr struct {
 var (
 	dRecs   logr
 	records [][]record
+	spikes  []string
 )
 
 func main() {
@@ -35,12 +48,10 @@ func main() {
 		WriteFatalErrs(err.Error())
 		log.Fatal(err)
 	}
-
+	conf := Config()
 	ctx := context.Background()
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
-	server := getServerToPing()
-	maxLatency := getMaxLat()
 	timeOutCount := 0
 
 	// Create a ticker that ticks every minute
@@ -61,11 +72,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	startNetmon(conf.S, conf.MaxLat, timeOutCount, todayStr, ticker)
+}
+
+func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker) {
 	for {
 		var r []record
 		// initializa new pinger
-		pinger, err := probing.NewPinger(server)
+		pinger, err := probing.NewPinger(s)
 		if err != nil {
+			WriteFatalErrs(err.Error())
 			log.Fatal("PINGER INITIALIZATION ERR: ", err)
 		}
 
@@ -79,6 +95,7 @@ func main() {
 		start := time.Now()
 		err = pinger.Run()
 		if err != nil {
+			WriteNetworkDownErrs(err.Error(), time.Now())
 			log.Println("PINGER ERR: ", err)
 		}
 
@@ -86,19 +103,25 @@ func main() {
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
 
-		if int(latency.Milliseconds()) >= maxLatency {
-			timeOutCount++
+		if int(latency.Milliseconds()) >= maxLat {
+			spikes = append(spikes, start.Format(time.TimeOnly))
+			tCount++
 		}
 
 		// only send alert if more than 3 timeouts have occurred
-		if timeOutCount >= 3 {
-			timeOutCount = 0
-			// Write the
+		if tCount >= 3 {
+			tCount = 0
 			if err := WriteLatenciesLog(); err != nil {
-				WriteFatalErrs(err.Error())
 				log.Fatal(err)
 			}
-			err := possibleDowntimeMail()
+			alert := &Alert{
+				MaxLat: maxLat,
+				LastSpike: Spike{
+					T:   start.Format(time.TimeOnly),
+					Lat: uint16(latency.Milliseconds()),
+				},
+			}
+			err := possibleDowntimeMail(alert)
 			if err != nil {
 				log.Println(err)
 			}
@@ -117,22 +140,34 @@ func main() {
 		records = append(records, r)
 
 		dRecs = logr{
-			Day:       todayStr,
+			Day:       today,
 			UpdatedAt: time.Now().Format(time.TimeOnly),
 			Records:   records,
 		}
 
 		// clear records every 5 minutes
 		select {
-		case <-ticker.C:
-			clearRecords()
+		case <-t.C:
+			records = clearRecords(records)
 		default:
 		}
 
-		// time.Sleep(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 
-func clearRecords() {
-	records = [][]record{}
+func Config() *NetMonConf {
+	return &NetMonConf{
+		Email:      os.Getenv("email"),
+		Pwd:        os.Getenv("pwd"),
+		S:          getServerToPing(),
+		Port:       getPort(),
+		Recipients: getEmails(),
+		MaxLat:     getMaxLat(),
+		AlertMsg:   getAlertMsg(),
+	}
+}
+
+func clearRecords(r [][]record) [][]record {
+	return [][]record{}
 }

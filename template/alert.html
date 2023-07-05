@@ -53,8 +53,29 @@
             </h1>
           </div>
 
-          <p style="font-size: 1.05rem; padding: 1rem; text-align: start">
+          <p
+            style="
+              font-size: 1.05rem;
+              padding: 1rem 1rem 0 1rem;
+              text-align: start;
+              margin: 0;
+            "
+          >
+            Maximum expected latencies: <b>{{.MaxLat}}ms</b>
+          </p>
+          <!-- <p style="font-size: 1.05rem; padding: 1rem; text-align: start">
             {{.Message}}
+          </p> -->
+          <p
+            style="
+              font-size: 1.05rem;
+              padding: 1rem;
+              text-align: start;
+              margin: 0;
+            "
+          >
+            Last Spike happened at: <b>{{.LastSpike.T}}</b> with a latency of:
+            <b>{{.LastSpike.Lat}}ms</b>
           </p>
         </div>
       </div>

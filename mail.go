@@ -3,28 +3,29 @@ package main
 import (
 	"log"
 	"net/smtp"
-	"os"
 )
 
 type ServerLocation struct {
 	URL string
 }
-
-type Alert struct {
-	Message string
+type Spike struct {
+	T   string
+	Lat uint16
 }
 
-func possibleDowntimeMail() error {
-	// Recipient(s) email address(es)
-	recipients := getEmails()
-	msg := getAlertMsg()
+type Alert struct {
+	MaxLat    int
+	Message   string
+	LastSpike Spike
+}
 
-	message := &Alert{
-		Message: msg,
-	}
+func possibleDowntimeMail(t *Alert) error {
+	// Recipient(s) email address(es)
+	recipients := Config().Recipients
+	t.Message = Config().AlertMsg
 
 	mime := "Content-Type: text/html; charset=utf-8\r\n"
-	body, err := alertMailTempl(message)
+	body, err := alertMailTempl(t)
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ Send the server's location to concerned parties.
 Ideally should only ever happen once when the program is launched
 */
 func serverLocMail(uri string) error {
-	recipients := getEmails()
+	recipients := Config().Recipients
 	loc := &ServerLocation{
 		URL: uri,
 	}
@@ -72,8 +73,8 @@ func serverLocMail(uri string) error {
 }
 
 func sendMail(to string, msg []byte) error {
-	from := os.Getenv("email")
-	password := os.Getenv("pwd")
+	from := Config().Email
+	password := Config().Pwd
 
 	smtpHost := "smtp.gmail.com"
 	smtpAddr := smtpHost + ":587"
