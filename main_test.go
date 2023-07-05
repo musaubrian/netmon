@@ -10,6 +10,7 @@ func TestConfig(t *testing.T) {
 	expected := &NetMonConf{
 		Email:      os.Getenv("email"),
 		Pwd:        os.Getenv("pwd"),
+		NgrokToken: os.Getenv("ngrok_token"),
 		S:          getServerToPing(),
 		Port:       getPort(),
 		Recipients: getEmails(),
@@ -24,6 +25,9 @@ func TestConfig(t *testing.T) {
 	}
 	if expected.Pwd != res.Pwd {
 		t.Errorf("Expected %s got %s", expected.Pwd, res.Pwd)
+	}
+	if expected.NgrokToken != res.NgrokToken {
+		t.Errorf("Expected %s got %s", expected.NgrokToken, res.NgrokToken)
 	}
 	if expected.S != res.S {
 		t.Errorf("Expected %s got %s", expected.S, res.S)

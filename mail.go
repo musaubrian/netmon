@@ -15,14 +15,12 @@ type Spike struct {
 
 type Alert struct {
 	MaxLat    int
-	Message   string
 	LastSpike Spike
 }
 
 func possibleDowntimeMail(t *Alert) error {
 	// Recipient(s) email address(es)
 	recipients := Config().Recipients
-	t.Message = Config().AlertMsg
 
 	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	body, err := alertMailTempl(t)

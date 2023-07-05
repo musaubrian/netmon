@@ -23,15 +23,16 @@ func TestServerLocTempl(t *testing.T) {
 
 func TestAlertMailTempl(t *testing.T) {
 	alert := &Alert{
-		Message: getAlertMsg(),
+		LastSpike: Spike{
+			T: "12:28",
+		},
 	}
 
 	res, err := alertMailTempl(alert)
 	if err != nil {
 		t.Errorf("Expected nil got %v", err)
 	}
-
-	if !strings.Contains(res.String(), alert.Message) {
-		t.Errorf("Expected [%s] to be in template", alert.Message)
+	if !strings.Contains(res.String(), alert.LastSpike.T) {
+		t.Errorf("Expected [%s] to be in template", alert.LastSpike.T)
 	}
 }

@@ -12,8 +12,9 @@ import (
 
 type NetMonConf struct {
 	// For authentication
-	Email string
-	Pwd   string
+	Email      string
+	Pwd        string
+	NgrokToken string
 
 	S          string
 	Port       int
@@ -57,7 +58,7 @@ func main() {
 	// Create a ticker that ticks every minute
 	ticker := time.NewTicker(5 * time.Minute)
 
-	ngrok_token := os.Getenv("ngrok_token")
+	ngrok_token := Config().NgrokToken
 
 	tunn, err := createNgrokListener(ctx, ngrok_token)
 	if err != nil {
@@ -160,11 +161,11 @@ func Config() *NetMonConf {
 	return &NetMonConf{
 		Email:      os.Getenv("email"),
 		Pwd:        os.Getenv("pwd"),
+		NgrokToken: os.Getenv("ngrok_token"),
 		S:          getServerToPing(),
 		Port:       getPort(),
 		Recipients: getEmails(),
 		MaxLat:     getMaxLat(),
-		AlertMsg:   getAlertMsg(),
 	}
 }
 
