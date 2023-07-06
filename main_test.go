@@ -44,10 +44,10 @@ func TestConfig(t *testing.T) {
 }
 
 func TestClearRecords(t *testing.T) {
-	var rc []record
-	var rcs [][]record
+	var rc []Record
+	var rcs [][]Record
 
-	rc = append(rc, record{
+	rc = append(rc, Record{
 		Start:   time.Now(),
 		Latency: 100,
 	})

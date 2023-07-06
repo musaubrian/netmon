@@ -23,20 +23,20 @@ type NetMonConf struct {
 	AlertMsg   string
 }
 
-type record struct {
+type Record struct {
 	Start   time.Time `json:"start"`
 	Latency uint16    `json:"latency"`
 }
 
-type logr struct {
+type Logr struct {
 	Day       string     `json:"day"`
 	UpdatedAt string     `json:"updated_at"`
-	Records   [][]record `json:"records"`
+	Records   [][]Record `json:"records"`
 }
 
 var (
-	dRecs   logr
-	records [][]record
+	dRecs   Logr
+	records [][]Record
 	spikes  []string
 )
 
@@ -78,7 +78,7 @@ func main() {
 
 func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker) {
 	for {
-		var r []record
+		var r []Record
 		// initializa new pinger
 		pinger, err := probing.NewPinger(s)
 		if err != nil {
@@ -133,14 +133,14 @@ func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker)
 		}
 
 		r = append(r,
-			record{
+			Record{
 				Start:   start,
 				Latency: uint16(latency.Milliseconds()),
 			})
 
 		records = append(records, r)
 
-		dRecs = logr{
+		dRecs = Logr{
 			Day:       today,
 			UpdatedAt: time.Now().Format(time.TimeOnly),
 			Records:   records,
@@ -153,6 +153,7 @@ func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker)
 		default:
 		}
 
+		// Send two pings per second
 		time.Sleep(500 * time.Millisecond)
 	}
 }
@@ -169,6 +170,6 @@ func Config() *NetMonConf {
 	}
 }
 
-func clearRecords(r [][]record) [][]record {
-	return [][]record{}
+func clearRecords(r [][]Record) [][]Record {
+	return [][]Record{}
 }
