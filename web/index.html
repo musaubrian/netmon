@@ -1,120 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <title></title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
-      rel="stylesheet"
-    />
-    <title>NetMon</title>
-  </head>
-  <body style="font-family: 'Varela Round', sans-serif">
-    <div
-      style="
+
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet" />
+  <title>NetMon</title>
+</head>
+
+<body style="font-family: &quot;Varela Round&quot;, sans-serif">
+  <div style="
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100vw;
         height: auto;
-      "
-    >
-      <h1 id="h1" style="text-align: center; margin-bottom: 0"></h1>
-      <h2 id="h2" style="text-align: center"></h2>
-      <canvas
-        id="myChart"
-        style="max-height: 70vh; height: 50vh; max-width: 90vw"
-      ></canvas>
-    </div>
-  </body>
-  <script>
-    const h1 = document.getElementById("h1");
-    const h2 = document.getElementById("h2");
-    function fetchLogs() {
-      return fetch("/logs")
-        .then((response) => response.json())
-        .then((data) => {
-          let records = data.records;
-          h1.innerHTML = data.day;
-          h2.innerHTML = `Updated at: ${data.updated_at}`;
-          let newxValues = [];
-          let newyValues = [];
+      ">
+    <h1 id="h1" style="text-align: center; margin-bottom: 0"></h1>
+    <h2 id="h2" style="text-align: center"></h2>
+    <canvas id="myChart" style="max-height: 70vh; height: 50vh; max-width: 90vw"></canvas>
+  </div>
+</body>
+<script>
+  const h1 = document.getElementById("h1");
+  const h2 = document.getElementById("h2");
+  function fetchLogs() {
+    return fetch("/logs")
+      .then((response) => response.json())
+      .then((data) => {
+        let records = data.records;
+        h1.innerHTML = data.day;
+        h2.innerHTML = `Updated at: ${data.updated_at}`;
+        let newxValues = [];
+        let newyValues = [];
 
-          let startLoopIndex = Math.max(0, records.length - 60); // Get last 60 items(minute)
+        let startLoopIndex = Math.max(0, records.length - 60); // Get last 60 items(minute)
 
-          for (let i = startLoopIndex; i < records.length; i++) {
-            let record = records[i];
-            for (let j = 0; j < record.length; j++) {
-              newxValues.push(record[j].start);
-              newyValues.push(record[j].latency);
-            }
+        for (let i = startLoopIndex; i < records.length; i++) {
+          let record = records[i];
+          for (let j = 0; j < record.length; j++) {
+            newxValues.push(record[j].start);
+            newyValues.push(record[j].latency);
           }
+        }
 
-          // // Replace x&yValues with new values
-          xValues.splice(0, xValues.length, ...newxValues);
-          yValues.splice(0, yValues.length, ...newyValues);
+        // // Replace x&yValues with new values
+        xValues.splice(0, xValues.length, ...newxValues);
+        yValues.splice(0, yValues.length, ...newyValues);
 
-          // Trigger chart update
-          myChart.data.labels = xValues;
-          myChart.data.datasets[0].data = yValues;
-          myChart.update();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+        // Trigger chart update
+        myChart.data.labels = xValues;
+        myChart.data.datasets[0].data = yValues;
+        myChart.update();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 
-    const xValues = [];
-    const yValues = [];
+  const xValues = [];
+  const yValues = [];
 
-    const myChart = new Chart("myChart", {
-      type: "line",
-      data: {
-        labels: xValues,
-        datasets: [
+  const myChart = new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [
+        {
+          fill: false,
+          lineTension: 0.15,
+          pointRadius: 0,
+          backgroundColor: "white",
+          borderColor: "rgba(42, 29, 245, 0.8)",
+          data: yValues,
+        },
+      ],
+    },
+    options: {
+      legend: {display: false},
+      scales: {
+        xAxes: [
           {
-            fill: false,
-            lineTension: 0.15,
-            pointRadius: 0,
-            backgroundColor: "white",
-            borderColor: "rgba(42, 29, 245, 0.8)",
-            data: yValues,
+            ticks: {display: false},
+            scaleLabel: {
+              display: true,
+              labelString: "Requests in a minute",
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ticks: {min: 0},
+            scaleLabel: {
+              display: true,
+              labelString: "Time to respond (milliseconds)",
+            },
           },
         ],
       },
-      options: {
-        legend: { display: false },
-        scales: {
-          xAxes: [
-            {
-              ticks: { display: false },
-              scaleLabel: {
-                display: true,
-                labelString: "Requests in a minute",
-              },
-            },
-          ],
-          yAxes: [
-            {
-              ticks: { min: 0 },
-              scaleLabel: {
-                display: true,
-                labelString: "Time to respond (milliseconds)",
-              },
-            },
-          ],
-        },
-      },
-    });
+    },
+  });
 
-    //initial fetch
-    fetchLogs();
-    // the rest
-    setInterval(fetchLogs, 60 * 1000);
-  </script>
+  //initial fetch
+  fetchLogs();
+  // the rest
+  setInterval(fetchLogs, 60 * 1000);
+</script>
+
 </html>

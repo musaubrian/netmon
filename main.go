@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"runtime"
@@ -82,8 +83,9 @@ func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker)
 		// initializa new pinger
 		pinger, err := probing.NewPinger(s)
 		if err != nil {
+			err = errors.Join(errors.New("PINGER INITIALIZATION ERR: "), err)
 			WriteFatalErrs(err.Error())
-			log.Fatal("PINGER INITIALIZATION ERR: ", err)
+			log.Fatal(err)
 		}
 
 		// WINDOWS PRIVILEGES
@@ -97,7 +99,7 @@ func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker)
 		err = pinger.Run()
 		if err != nil {
 			WriteNetworkDownErrs(err.Error(), time.Now())
-			log.Println("PINGER ERR: ", err)
+			log.Println("PINGER ERR", err)
 		}
 
 		// ping results
