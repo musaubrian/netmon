@@ -17,11 +17,11 @@ type NetMonConf struct {
 	Pwd        string
 	NgrokToken string
 
-	S          string
+	S          string // Server to ping
 	Port       int
 	Recipients []string
 	MaxLat     int
-	AlertMsg   string
+	TimeOut    int // Maximum pinger timeout
 }
 
 type Record struct {
@@ -36,21 +36,22 @@ type Logr struct {
 }
 
 var (
-	dRecs   Logr
-	records [][]Record
-	spikes  []string
+	dRecs     Logr
+	records   [][]Record
+	spikes    []string
+	down      bool
+	alertOnUp = true
 )
 
 func main() {
 	if err := loadEnv(); err != nil {
-		WriteFatalErrs(err.Error())
+		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
 	if err := loadConfig(); err != nil {
-		WriteFatalErrs(err.Error())
+		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
-	conf := Config()
 	ctx := context.Background()
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
@@ -63,28 +64,30 @@ func main() {
 
 	tunn, err := createNgrokListener(ctx, ngrok_token)
 	if err != nil {
-		WriteFatalErrs(err.Error())
+		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
 	// Start up http server
 	go Server(ctx, tunn)
 
 	if err := serverLocMail(tunn.URL()); err != nil {
-		WriteFatalErrs(err.Error())
+		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
 
-	startNetmon(conf.S, conf.MaxLat, timeOutCount, todayStr, ticker)
+	startNetmon(Config().S, timeOutCount, todayStr, ticker, tunn.URL())
 }
 
-func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker) {
+func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string) {
 	for {
 		var r []Record
+		maxLat := Config().MaxLat
+		down = false
 		// initializa new pinger
 		pinger, err := probing.NewPinger(s)
 		if err != nil {
 			err = errors.Join(errors.New("PINGER INITIALIZATION ERR: "), err)
-			WriteFatalErrs(err.Error())
+			WriteFatalLog(err.Error())
 			log.Fatal(err)
 		}
 
@@ -93,19 +96,28 @@ func startNetmon(s string, maxLat int, tCount int, today string, t *time.Ticker)
 			pinger.SetPrivileged(true)
 		}
 
-		pinger.Timeout = 500 * time.Millisecond
+		pinger.Timeout = time.Duration(Config().TimeOut * int(time.Millisecond))
 
 		start := time.Now()
 		err = pinger.Run()
 		if err != nil {
-			WriteNetworkDownErrs(err.Error(), time.Now())
-			log.Println("PINGER ERR", err)
+			// Write to file instead of cluttering stdout
+			WriteNetworkDownLog(err.Error(), time.Now())
+			down = true
+			alertOnUp = false
 		}
 
 		// ping results
 		stats := pinger.Statistics()
 		latency := stats.AvgRtt
 
+		if !down && !alertOnUp {
+			down = false
+			alertOnUp = true
+			if err := notifyOnBackOnline(uri); err != nil {
+				log.Println(err)
+			}
+		}
 		if int(latency.Milliseconds()) >= maxLat {
 			spikes = append(spikes, start.Format(time.TimeOnly))
 			tCount++
@@ -169,6 +181,7 @@ func Config() *NetMonConf {
 		Port:       getPort(),
 		Recipients: getEmails(),
 		MaxLat:     getMaxLat(),
+		TimeOut:    getPingerTimeout(),
 	}
 }
 

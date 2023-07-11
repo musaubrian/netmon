@@ -36,3 +36,15 @@ func TestCreateLogErr(t *testing.T) {
 		t.Errorf("Expected [%s] got %s", formattedT, _fT)
 	}
 }
+
+func TestReadNetDownLogs(t *testing.T) {
+
+	lg, err := ReadNetDownLog()
+	if err != nil {
+		t.Errorf("Expected nil got %v", err)
+	}
+
+	if len(lg.Date) < 1 || len(lg.Time) < 1 {
+		t.Error("Expected a non empty value")
+	}
+}

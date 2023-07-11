@@ -36,7 +36,7 @@ func possibleDowntimeMail(t *Alert) error {
 			return err
 		}
 	}
-	log.Println("L1 NOTIFIED")
+	log.Println("L1 NOTIFIED ON NETWORK ISSUES")
 	return nil
 }
 
@@ -67,6 +67,37 @@ func serverLocMail(uri string) error {
 	}
 
 	log.Println("SERVER LOCATION SHARED")
+	return nil
+}
+
+/*
+If the network was down and comes back up
+
+Notify the necessary people
+*/
+func notifyOnBackOnline(uri string) error {
+	recipients := Config().Recipients
+	lg, err := ReadNetDownLog()
+	lg.URL = uri
+	if err != nil {
+		return err
+	}
+
+	mime := "Content-Type: text/html; charset=utf-8\r\n"
+	body, err := backOnlineNotif(lg)
+	if err != nil {
+		return err
+	}
+	for _, recipient := range recipients {
+		email := []byte("To:" + recipient +
+			"\r\nSubject: 📡 Back Online\r\n" +
+			mime + "\r\n" + body.String())
+		err := sendMail(recipient, email)
+		if err != nil {
+			return err
+		}
+	}
+	log.Println("BACK ONLINE")
 	return nil
 }
 

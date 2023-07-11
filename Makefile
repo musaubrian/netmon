@@ -2,13 +2,14 @@ GO := go
 SRC := .
 BIN := _netmon
 BIN_DIR := ./bin
+LOG_DIR := ./logs
 BIN_LOC := $(BIN_DIR)/$(BIN)
 
 .PHONY: build clean start test
 
 build:
-	@mkdir -p ./bin
-	@mkdir -p ./logs
+	@mkdir -p $(BIN_DIR)
+	@mkdir -p $(LOG_DIR)
 	@$(GO) build -o $(BIN_LOC) $(SRC)
 
 start:build
@@ -19,4 +20,5 @@ test:
 
 clean:
 	@rm -r $(BIN_DIR)
-	@echo "Removed './bin' directory"
+	@rm -r $(LOG_DIR)
+	@echo "Removed './bin && ./logs' directory"

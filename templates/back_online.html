@@ -1,0 +1,63 @@
+<html>
+
+<head>
+  <style>
+    .inner {
+      width: 65%;
+      background-color: #f1f5f9;
+    }
+
+    @media screen and (max-width: 800px) {
+      .inner {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        padding: 1rem;
+      ">
+    <div class="inner" style="
+          padding: 1rem;
+          border-radius: 15px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        ">
+      <div style="width: 100%; display: block; text-align: center">
+        <!-- <h3 style="font-size: 1.4rem">Back Online</h3> -->
+        <p style="font-size: 1.2rem; margin: 1rem 0.5rem auto">
+          Netmon came back online at <b>{{.Time}}</b>
+          <br />
+          You can access it
+        </p>
+        <a href="{{.URL}}" target="_blank" style="
+                background-color: #10b981;
+                width: 40%;
+                font-weight: 750;
+                padding: 0.7rem;
+                border-radius: 20px;
+                color: white;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                text-decoration: none;
+                font-size: 1.2rem;
+                margin-top: 0.5rem;
+              ">
+          <span style="width: 100%; text-align: center"> Here </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

@@ -4,10 +4,13 @@ server:
   web_server_port: 8000
   # The maximum latency you expect to experience or as the ISP states
   # In milliseconds
-  max_latency: 500
+  max_latency: 700
+  # How long to wait before considering the ping to have failed
+  # In milliseconds
+  pinger_timeout: 500 
 
 # People to notify
 emails:
-  - user@domain.com
-  - user@domain.com
-  - user@domain.com
+  - user@domain
+  - user@domain
+  - user@domain

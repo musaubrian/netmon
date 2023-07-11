@@ -12,7 +12,17 @@ import (
 	"golang.ngrok.com/ngrok/config"
 )
 
-func getLogs(w http.ResponseWriter, r *http.Request) {
+func Server(ctx context.Context, tunn ngrok.Tunnel) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/down", getLastNetDown)
+	mux.HandleFunc("/lats", getLatencies)
+	mux.HandleFunc("/", displayGraph)
+
+	log.Println("TUNNEL CREATED AT:", tunn.URL())
+	log.Fatal(http.Serve(tunn, mux))
+}
+
+func getLatencies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	res, err := json.Marshal(dRecs)
 	if err != nil {
@@ -38,13 +48,18 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func Server(ctx context.Context, tunn ngrok.Tunnel) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/logs", getLogs)
-	mux.HandleFunc("/", displayGraph)
-
-	log.Println("TUNNEL CREATED AT:", tunn.URL())
-	log.Fatal(http.Serve(tunn, mux))
+func getLastNetDown(w http.ResponseWriter, r *http.Request) {
+	l, err := ReadNetDownLog()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	lg, err := json.Marshal(l)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(lg)
 }
 
 // extract NGROK initialization to function

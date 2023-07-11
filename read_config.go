@@ -36,7 +36,6 @@ func getEmails() []string {
 func getMaxLat() int {
 	return viper.GetInt("server.max_latency")
 }
-
-func getAlertMsg() string {
-	return viper.GetString("alert.message")
+func getPingerTimeout() int {
+	return viper.GetInt("server.pinger_timeout")
 }

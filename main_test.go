@@ -15,7 +15,7 @@ func TestConfig(t *testing.T) {
 		Port:       getPort(),
 		Recipients: getEmails(),
 		MaxLat:     getMaxLat(),
-		AlertMsg:   getAlertMsg(),
+		TimeOut:    getPingerTimeout(),
 	}
 
 	res := Config()
@@ -38,8 +38,8 @@ func TestConfig(t *testing.T) {
 	if expected.MaxLat != res.MaxLat {
 		t.Errorf("Expected %d got %d", expected.MaxLat, res.MaxLat)
 	}
-	if expected.AlertMsg != res.AlertMsg {
-		t.Errorf("Expected %s got %s", expected.AlertMsg, res.AlertMsg)
+	if expected.TimeOut != res.TimeOut {
+		t.Errorf("Expected %d got %d", expected.TimeOut, res.TimeOut)
 	}
 }
 
