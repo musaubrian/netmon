@@ -12,8 +12,13 @@
   <title>NetMon</title>
 </head>
 
-<body
-  style="font-family: &quot;Varela Round&quot;, sans-serif; margin: 0; padding: 0; box-sizing: border-box; height: 100vh;">
+<body style="
+      font-family: &quot;Varela Round&quot;, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      height: 100vh;
+    ">
   <div style="
         display: flex;
         flex-direction: column;
@@ -22,68 +27,17 @@
         width: 100vw;
         height: auto;
       ">
-    <h1 id="h1" style="text-align: center; margin-bottom: 1rem; width: 50%"></h1>
+    <h1 id="h1" style="text-align: center; margin-bottom: 0; width: 50%"></h1>
 
     <canvas id="myChart" style="max-height: 70vh; height: 50vh; max-width: 90vw" aria-label="Graph of latency by time"
       role="image">
     </canvas>
-
-    <h2 id="h2" style="text-align: center; margin-bottom: 0.5rem; font-size: 1.14rem;"></h2>
-    <span style="font-size: 1.15rem;">
-      Last outage
-      <button id="open" style="
-          background-color: transparent;
-          border:0;
-          padding: 0;
-          text-decoration: underline;
-          font-size: inherit;
-        ">
-        ended at
-      </button>
-    </span>
-    <dialog style="border-radius: 20px; border: 0; background-color: #cbd5e1">
-      <div style="margin-bottom: 0.5rem">
-        <p style="font-size: 1.2rem; margin-bottom: 0.2rem; padding: 0.5rem">
-          Internet came back up on<br>
-          <span id="date" style="font-weight: 650; font-size: 1rem"> _ </span>
-          at
-          <span id="time" style="font-weight: 650; font-size: 1rem">_ </span>
-        </p>
-      </div>
-      <form method="dialog" style="width: 100%; display: inline-flex; justify-content: end">
-        <button style="
-              background-color: green;
-              border: none;
-              border-radius: 15px;
-              font-size: 1rem;
-              padding: 0.7rem;
-            ">
-          Close
-        </button>
-      </form>
-    </dialog>
+    <h2 id="h2" style="text-align: center; font-size: 1.14rem"></h2>
   </div>
 </body>
 <script>
   const h1 = document.getElementById("h1");
   const h2 = document.getElementById("h2");
-  const d = document.getElementById("date");
-  const t = document.getElementById("time");
-  const openDialogue = document.getElementById("open");
-  const dialogue = document.querySelector("dialog");
-
-  openDialogue.addEventListener("click", () => {
-    dialogue.showModal();
-  });
-
-  function getLastDown() {
-    return fetch("/down")
-      .then((res) => res.json())
-      .then((data) => {
-        d.innerHTML = data.date;
-        t.innerHTML = data.time;
-      });
-  }
 
   function fetchLogs() {
     return fetch("/lats")
@@ -129,8 +83,8 @@
       datasets: [
         {
           fill: false,
-          lineTension: 0.25,
-          pointRadius: 1,
+          lineTension: 0.2,
+          pointRadius: 0,
           backgroundColor: "white",
           borderColor: "rgba(42, 29, 245, 0.8)",
           data: yValues,
@@ -149,6 +103,9 @@
       scales: {
         xAxes: [
           {
+            gridLines: {
+              display: false,
+            },
             ticks: {display: false},
             scaleLabel: {
               display: true,
@@ -170,10 +127,8 @@
 
   //initial fetch
   fetchLogs();
-  getLastDown();
 
   setInterval(fetchLogs(), 60 * 1000);
-  setInterval(getLastDown(), 5 * 60 * 1000);
 </script>
 
 </html>

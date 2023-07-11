@@ -14,7 +14,6 @@ import (
 
 func Server(ctx context.Context, tunn ngrok.Tunnel) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/down", getLastNetDown)
 	mux.HandleFunc("/lats", getLatencies)
 	mux.HandleFunc("/", displayGraph)
 
@@ -46,20 +45,6 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-func getLastNetDown(w http.ResponseWriter, r *http.Request) {
-	l, err := ReadNetDownLog()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	lg, err := json.Marshal(l)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write(lg)
 }
 
 // extract NGROK initialization to function
