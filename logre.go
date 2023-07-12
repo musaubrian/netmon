@@ -19,7 +19,8 @@ func WriteFatalLog(e string) {
 	// add a new line to the result
 	c := createLogErr(e, t)
 	content := c + "\n---\n\n"
-	f, err := os.OpenFile("./logs/fatal", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
+	p := "logs" + string(os.PathSeparator) + "fatal"
+	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +32,8 @@ func WriteLatenciesLog() error {
 	t := time.Now()
 	e := fmt.Sprintf("Latencies exceeded %dms\n", getMaxLat())
 	content := createLogErr(e, t)
-	f, err := os.OpenFile("./logs/latencies", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
+	p := "logs" + string(os.PathSeparator) + "latencies"
+	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
 	if err != nil {
 		return err
 	}
