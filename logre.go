@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
-	"strings"
-	"sync"
 	"time"
 )
 
@@ -15,24 +12,6 @@ type LastLog struct {
 	Date string `json:"date"`
 	Time string `json:"time"`
 	URL  string
-}
-
-var mu sync.Mutex
-
-func WriteNetworkDownLog(e string, t time.Time) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	c := createLogErr(e, t)
-	content := c + "\n"
-
-	// Overwrite the contents everytime, making the file only ever one line long
-	f, err := os.OpenFile("./logs/network_down", os.O_WRONLY|os.O_CREATE, 0o660)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	f.WriteString(content)
 }
 
 func WriteFatalLog(e string) {
@@ -72,22 +51,4 @@ func createLogErr(err string, t time.Time) string {
 func formatTime(t time.Time) string {
 	formattedTime := t.Format(time.DateTime)
 	return formattedTime
-}
-
-func ReadNetDownLog() (*LastLog, error) {
-	var l string
-
-	f, err := os.Open("./logs/network_down")
-	defer f.Close()
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		l = sc.Text()
-	}
-	arrL := strings.Split(l, " ")
-	lg := &LastLog{
-		Date: arrL[0],
-		Time: arrL[1],
-	}
-
-	return lg, err
 }

@@ -36,11 +36,12 @@ type Logr struct {
 }
 
 var (
-	dRecs     Logr
-	records   [][]Record
-	spikes    []string
-	down      bool
-	alertOnUp = true
+	dRecs      Logr
+	records    [][]Record
+	spikes     []string
+	down       bool
+	netDownErr string
+	alertOnUp  = true
 )
 
 func main() {
@@ -101,8 +102,7 @@ func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string)
 		start := time.Now()
 		err = pinger.Run()
 		if err != nil {
-			// Write to file instead of cluttering stdout
-			WriteNetworkDownLog(err.Error(), time.Now())
+			netDownErr = createLogErr(err.Error(), time.Now())
 			down = true
 			alertOnUp = false
 		}

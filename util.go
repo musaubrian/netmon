@@ -23,3 +23,13 @@ func minimalDate(d string) string {
 	f = u[0] + " " + u[1]
 	return f
 }
+
+func cleanNetDownErr(n string) ([]string, error) {
+	var s []string
+	if len(n) > 1 {
+		s = strings.Split(n, " ")
+	} else {
+		return s, errors.New("Empty value, cannot be split")
+	}
+	return s, nil
+}
