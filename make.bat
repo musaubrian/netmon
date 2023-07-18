@@ -1,4 +1,4 @@
-mkdir -p logs
+mkdir logs
 go mod tidy
 go build  .
 cls
