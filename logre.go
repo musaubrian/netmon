@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// last log written in the network_down log file
+// The last downtime error
 type LastLog struct {
 	Date string `json:"date"`
 	Time string `json:"time"`

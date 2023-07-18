@@ -8,6 +8,7 @@ import (
 type ServerLocation struct {
 	URL string
 }
+
 type Spike struct {
 	T   string
 	Lat uint16

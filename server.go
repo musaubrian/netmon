@@ -14,6 +14,7 @@ import (
 
 func Server(ctx context.Context, tunn ngrok.Tunnel) {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/gif", Gif)
 	mux.HandleFunc("/lats", getLatencies)
 	mux.HandleFunc("/", displayGraph)
 
@@ -45,6 +46,10 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func Gif(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./web/static/calltronix.gif")
 }
 
 // extract NGROK initialization to function

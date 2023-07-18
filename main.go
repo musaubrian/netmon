@@ -68,6 +68,7 @@ func main() {
 		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
+
 	// Start up http server
 	go Server(ctx, tunn)
 
