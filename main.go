@@ -58,9 +58,13 @@ func main() {
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
 	timeOutCount := 0
+	b64, err := base64Gif()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	g := &Static{
-		Data: base64Gif(),
+		Data: b64,
 	}
 
 	// Create a ticker that ticks every minute

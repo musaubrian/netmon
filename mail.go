@@ -9,7 +9,7 @@ type Static struct {
 	Data string // base64 encoding of the gif
 }
 
-type ServerLocation struct {
+type ServiceLocation struct {
 	URL string
 	G   Static
 }
@@ -54,12 +54,12 @@ Ideally should only ever happen once when the program is launched
 */
 func serverLocMail(uri string, g *Static) error {
 	recipients := Config().Recipients
-	loc := &ServerLocation{
+	loc := &ServiceLocation{
 		URL: uri,
 		G:   *g,
 	}
 
-	body, err := serverLocTempl(loc)
+	body, err := serviceLocTempl(loc)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -67,14 +67,14 @@ func serverLocMail(uri string, g *Static) error {
 	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient +
-			"\r\nSubject: Server location\r\n" + mime + "\r\n" + body.String())
+			"\r\nSubject: Service location\r\n" + mime + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
 		}
 	}
 
-	log.Println("SERVER LOCATION SHARED")
+	log.Println("SHARED NETMON'S LOCATION")
 	return nil
 }
 

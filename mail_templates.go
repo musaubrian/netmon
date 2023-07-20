@@ -5,7 +5,7 @@ import (
 	"html/template"
 )
 
-func serverLocTempl(loc *ServerLocation) (bytes.Buffer, error) {
+func serviceLocTempl(loc *ServiceLocation) (bytes.Buffer, error) {
 	var templContents bytes.Buffer
 
 	templ, err := template.ParseFiles("./templates/server_loc.html")

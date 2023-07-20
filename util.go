@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"errors"
-	"log"
 	"os"
 	"strings"
 
@@ -38,11 +37,12 @@ func cleanNetDownErr(n string) ([]string, error) {
 }
 
 // Contents of the gif as a base64 string
-func base64Gif() string {
+func base64Gif() (string, error) {
+	var b64 string
 	g, err := os.ReadFile("./web/static/calltronix.gif")
 	if err != nil {
-		log.Fatal(err)
+		return b64, err
 	}
-	gB64 := base64.StdEncoding.EncodeToString(g)
-	return gB64
+	b64 = base64.StdEncoding.EncodeToString(g)
+	return b64, err
 }

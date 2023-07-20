@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestServerLocTempl(t *testing.T) {
-	location := &ServerLocation{
+func TestServiceLocTempl(t *testing.T) {
+	location := &ServiceLocation{
 		URL: "localhost:8000",
 	}
 
-	got, err := serverLocTempl(location)
+	got, err := serviceLocTempl(location)
 	if err != nil {
 		t.Errorf("Expected nil got %v", err)
 	}

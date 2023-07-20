@@ -26,5 +26,14 @@ func TestCleanNetDownErr(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected nil got %v", err)
 	}
+}
+func TestBase64Gif(t *testing.T) {
+	s, err := base64Gif()
+	if err != nil {
+		t.Errorf("Expected nil got %v", err)
+	}
+	if len(s) < 1 {
+		t.Error("Expected a noe empty string")
+	}
 
 }
