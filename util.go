@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -32,4 +35,14 @@ func cleanNetDownErr(n string) ([]string, error) {
 		return s, errors.New("Empty value, cannot be split")
 	}
 	return s, nil
+}
+
+// Contents of the gif as a base64 string
+func base64Gif() string {
+	g, err := os.ReadFile("./web/static/calltronix.gif")
+	if err != nil {
+		log.Fatal(err)
+	}
+	gB64 := base64.StdEncoding.EncodeToString(g)
+	return gB64
 }

@@ -53,10 +53,15 @@ func main() {
 		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
+
 	ctx := context.Background()
 	today := time.Now()
 	todayStr := minimalDate(today.Format(time.RFC850))
 	timeOutCount := 0
+
+	g := &Static{
+		Data: base64Gif(),
+	}
 
 	// Create a ticker that ticks every minute
 	ticker := time.NewTicker(5 * time.Minute)
@@ -72,15 +77,15 @@ func main() {
 	// Start up http server
 	go Server(ctx, tunn)
 
-	if err := serverLocMail(tunn.URL()); err != nil {
+	if err := serverLocMail(tunn.URL(), g); err != nil {
 		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
 
-	startNetmon(Config().S, timeOutCount, todayStr, ticker, tunn.URL())
+	startNetmon(Config().S, timeOutCount, todayStr, ticker, tunn.URL(), g)
 }
 
-func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string) {
+func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string, g *Static) {
 	for {
 		var r []Record
 		maxLat := Config().MaxLat
@@ -115,7 +120,7 @@ func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string)
 		if !down && !alertOnUp {
 			down = false
 			alertOnUp = true
-			if err := notifyOnBackOnline(uri); err != nil {
+			if err := notifyOnBackOnline(uri, g); err != nil {
 				log.Println(err)
 			}
 		}
@@ -131,11 +136,9 @@ func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string)
 				log.Fatal(err)
 			}
 			alert := &Alert{
-				MaxLat: maxLat,
-				LastSpike: Spike{
-					T:   start.Format(time.TimeOnly),
-					Lat: uint16(latency.Milliseconds()),
-				},
+				MaxLat:    maxLat,
+				LastSpike: Spike{T: start.Format(time.TimeOnly), Lat: uint16(latency.Milliseconds())},
+				G:         *g,
 			}
 			err := possibleDowntimeMail(alert)
 			if err != nil {

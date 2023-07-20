@@ -12,6 +12,7 @@ type LastLog struct {
 	Date string `json:"date"`
 	Time string `json:"time"`
 	URL  string
+	G    Static
 }
 
 func WriteFatalLog(e string) {
