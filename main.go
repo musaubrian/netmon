@@ -54,6 +54,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	today := time.Now()
+	todayStr := minimalDate(today.Format(time.RFC850))
+
 	ctx := context.Background()
 	timeOutCount := 0
 	b64, err := base64Gif()
@@ -84,13 +87,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	startNetmon(Config().S, timeOutCount, ticker, tunn.URL(), g)
+	startNetmon(Config().S, timeOutCount, ticker, todayStr, tunn.URL(), g)
 }
 
-func startNetmon(s string, tCount int, t *time.Ticker, uri string, g *Static) {
+func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string, g *Static) {
+	// adjust the date every six hours
+	dateTicker := time.NewTicker(6 * time.Hour)
 	for {
-		today := time.Now()
-		todayStr := minimalDate(today.Format(time.RFC850))
 		var r []Record
 		maxLat := Config().MaxLat
 		down = false
@@ -163,15 +166,19 @@ func startNetmon(s string, tCount int, t *time.Ticker, uri string, g *Static) {
 		records = append(records, r)
 
 		dRecs = Logr{
-			Day:       todayStr,
+			Day:       today,
 			UpdatedAt: time.Now().Format(time.TimeOnly),
 			Records:   records,
 		}
 
 		// clear records every 5 minutes
+		// Update the Display date every 6hrs
 		select {
 		case <-t.C:
 			records = clearRecords(records)
+		case <-dateTicker.C:
+			n := time.Now()
+			today = minimalDate(n.Format(time.RFC850))
 		default:
 		}
 
