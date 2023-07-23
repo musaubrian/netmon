@@ -55,8 +55,6 @@ func main() {
 	}
 
 	ctx := context.Background()
-	today := time.Now()
-	todayStr := minimalDate(today.Format(time.RFC850))
 	timeOutCount := 0
 	b64, err := base64Gif()
 	if err != nil {
@@ -86,11 +84,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	startNetmon(Config().S, timeOutCount, todayStr, ticker, tunn.URL(), g)
+	startNetmon(Config().S, timeOutCount, ticker, tunn.URL(), g)
 }
 
-func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string, g *Static) {
+func startNetmon(s string, tCount int, t *time.Ticker, uri string, g *Static) {
 	for {
+		today := time.Now()
+		todayStr := minimalDate(today.Format(time.RFC850))
 		var r []Record
 		maxLat := Config().MaxLat
 		down = false
@@ -163,7 +163,7 @@ func startNetmon(s string, tCount int, today string, t *time.Ticker, uri string,
 		records = append(records, r)
 
 		dRecs = Logr{
-			Day:       today,
+			Day:       todayStr,
 			UpdatedAt: time.Now().Format(time.TimeOnly),
 			Records:   records,
 		}
