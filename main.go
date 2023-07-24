@@ -91,8 +91,8 @@ func main() {
 }
 
 func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string, g *Static) {
-	// adjust the date every six hours
-	dateTicker := time.NewTicker(6 * time.Hour)
+	// adjust the date every three hours
+	dateTicker := time.NewTicker(3 * time.Hour)
 	for {
 		var r []Record
 		maxLat := Config().MaxLat
@@ -177,6 +177,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string,
 		case <-t.C:
 			records = clearRecords(records)
 		case <-dateTicker.C:
+			log.Println("Before: ", today)
 			n := time.Now()
 			today = minimalDate(n.Format(time.RFC850))
 		default:
