@@ -5,13 +5,8 @@ import (
 	"net/smtp"
 )
 
-type Static struct {
-	Data string // base64 encoding of the gif
-}
-
 type ServiceLocation struct {
 	URL string
-	G   Static
 }
 
 type Spike struct {
@@ -22,7 +17,6 @@ type Spike struct {
 type Alert struct {
 	MaxLat    int
 	LastSpike Spike
-	G         Static
 }
 
 func possibleDowntimeMail(t *Alert) error {
@@ -52,11 +46,10 @@ Send the server's location to concerned parties.
 
 Ideally should only ever happen once when the program is launched
 */
-func serverLocMail(uri string, g *Static) error {
+func serverLocMail(uri string) error {
 	recipients := Config().Recipients
 	loc := &ServiceLocation{
 		URL: uri,
-		G:   *g,
 	}
 
 	body, err := serviceLocTempl(loc)
@@ -83,7 +76,7 @@ If the network was down and comes back up
 
 Notify the necessary people
 */
-func notifyOnBackOnline(uri string, g *Static) error {
+func notifyOnBackOnline(uri string) error {
 	recipients := Config().Recipients
 	s, err := cleanNetDownErr(netDownErr)
 	if err != nil {
@@ -93,7 +86,6 @@ func notifyOnBackOnline(uri string, g *Static) error {
 		Date: s[0],
 		Time: s[1],
 		URL:  uri,
-		G:    *g,
 	}
 
 	mime := "Content-Type: text/html; charset=utf-8\r\n"

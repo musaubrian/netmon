@@ -1,5 +1,5 @@
 mkdir logs
 go mod tidy
-go build  .
+go build  . -o bin\netmon.exe
 cls
-netmon.exe
+bin\netmon.exe

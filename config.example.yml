@@ -2,12 +2,15 @@
 server:
   server_to_ping: 8.8.8.8
   web_server_port: 8000
+
   # The maximum latency you expect to experience or as the ISP states
   # In milliseconds
   max_latency: 700
-  # How long to wait before considering the ping to have failed
-  # In milliseconds
-  pinger_timeout: 500 
+  # How long to wait before ignoring the ping's results
+  # If exceeded, it defaults to 0
+  # If most of the latencies are 0, try increasing this value(pinger_timeout), to around 2000
+  # Windows defender has something to do with this
+  pinger_timeout: 500 # In milliseconds
 
 # People to notify
 emails:

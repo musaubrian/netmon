@@ -14,7 +14,7 @@ func serviceLocTempl(loc *ServiceLocation) (bytes.Buffer, error) {
 	}
 	err = templ.Execute(&templContents, loc)
 
-	return templContents, nil
+	return templContents, err
 }
 
 func alertMailTempl(alert *Alert) (bytes.Buffer, error) {

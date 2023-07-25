@@ -21,7 +21,11 @@ type NetMonConf struct {
 	Port       int
 	Recipients []string
 	MaxLat     int
-	TimeOut    int // Maximum pinger timeout
+
+	// Maximum pinger timeout
+	// How long to wait for a response before ignoring that ping's results
+	// If a ping exceeds this, its result defaults to 0
+	TimeOut int
 }
 
 type Record struct {
@@ -59,14 +63,6 @@ func main() {
 
 	ctx := context.Background()
 	timeOutCount := 0
-	b64, err := base64Gif()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	g := &Static{
-		Data: b64,
-	}
 
 	// Create a ticker that ticks every minute
 	ticker := time.NewTicker(5 * time.Minute)
@@ -82,15 +78,15 @@ func main() {
 	// Start up http server
 	go Server(ctx, tunn)
 
-	if err := serverLocMail(tunn.URL(), g); err != nil {
+	if err := serverLocMail(tunn.URL()); err != nil {
 		WriteFatalLog(err.Error())
 		log.Fatal(err)
 	}
 
-	startNetmon(Config().S, timeOutCount, ticker, todayStr, tunn.URL(), g)
+	startNetmon(Config().S, timeOutCount, ticker, todayStr, tunn.URL())
 }
 
-func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string, g *Static) {
+func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string) {
 	// adjust the date every three hours
 	dateTicker := time.NewTicker(3 * time.Hour)
 	for {
@@ -127,7 +123,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string,
 		if !down && !alertOnUp {
 			down = false
 			alertOnUp = true
-			if err := notifyOnBackOnline(uri, g); err != nil {
+			if err := notifyOnBackOnline(uri); err != nil {
 				log.Println(err)
 			}
 		}
@@ -143,9 +139,11 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string,
 				log.Fatal(err)
 			}
 			alert := &Alert{
-				MaxLat:    maxLat,
-				LastSpike: Spike{T: start.Format(time.TimeOnly), Lat: uint16(latency.Milliseconds())},
-				G:         *g,
+				MaxLat: maxLat,
+				LastSpike: Spike{
+					T:   start.Format(time.TimeOnly),
+					Lat: uint16(latency.Milliseconds()),
+				},
 			}
 			err := possibleDowntimeMail(alert)
 			if err != nil {
@@ -172,19 +170,18 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string,
 		}
 
 		// clear records every 5 minutes
-		// Update the Display date every 6hrs
+		// Update the Display date every 3hrs
 		select {
 		case <-t.C:
 			records = clearRecords(records)
 		case <-dateTicker.C:
-			log.Println("Before: ", today)
 			n := time.Now()
 			today = minimalDate(n.Format(time.RFC850))
 		default:
 		}
 
 		// Send two pings per second
-		time.Sleep(500 * time.Millisecond)
+		// time.Sleep(500 * time.Millisecond)
 	}
 }
 
