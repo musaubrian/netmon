@@ -39,11 +39,13 @@ func TestAlertMailTempl(t *testing.T) {
 
 func TestBackOnlineNotif(t *testing.T) {
 	lg := &LastLog{
-		Date: "2023-07-11",
-		Time: "12:28",
-		URL:  "localhost:8000",
+		Date:     "2023-07-11",
+		Time:     "12:28",
+		URL:      "localhost:8000",
+		Start:    "12:28",
+		Duration: "12 seconds",
 	}
-	str := "Netmon came back online at"
+	str := "An outage occured at"
 	res, err := backOnlineNotif(lg)
 	if err != nil {
 		t.Errorf("Expected nil got %v", err)
