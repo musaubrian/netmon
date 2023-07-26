@@ -121,7 +121,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 			alertOnUp = false
 			if down && !savedOutDownTime {
 				downTimeStart = time.Now()
-				log.Println("WENT DOWN AT:", downTimeStart.Format(time.Stamp))
+				log.Println("NETWORK DOWN")
 			}
 			savedOutDownTime = true
 		}
