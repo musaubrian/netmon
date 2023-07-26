@@ -76,17 +76,15 @@ If the network was down and comes back up
 
 Notify the necessary people
 */
-func notifyOnBackOnline(uri string) error {
+func notifyOnBackOnline(lg *LastLog) error {
 	recipients := Config().Recipients
 	s, err := cleanNetDownErr(netDownErr)
 	if err != nil {
 		return err
 	}
-	lg := &LastLog{
-		Date: s[0],
-		Time: s[1],
-		URL:  uri,
-	}
+
+	lg.Time = s[0]
+	lg.Time = s[1]
 
 	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	body, err := backOnlineNotif(lg)

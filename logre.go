@@ -9,9 +9,11 @@ import (
 
 // The last downtime error
 type LastLog struct {
-	Date string `json:"date"`
-	Time string `json:"time"`
-	URL  string
+	Date     string `json:"date"`
+	Time     string `json:"time"`
+	URL      string
+	Start    string // Time net went down
+	Duration string // How long net was down for
 }
 
 func WriteFatalLog(e string) {

@@ -33,10 +33,16 @@
         ">
       <div style="width: 100%; display: block; text-align: center">
         <br>
-        <p style="font-size: 1.2rem; margin: 1rem 0.5rem auto">
+        <p style="font-size: 1.2rem; margin: 0.5rem auto">
           Netmon came back online at <b>{{.Time}}</b>
-          <br />
+        </p>
+        <p style="font-size: 1.2rem; margin: 0.5rem auto">
+          Internet was down from <b>{{.Start}}</b>
+          for <b>{{.Duration}}</b>
+        </p>
+        <p style="font-size: 1.2rem; margin: 1rem 0.5rem">
           You can access it
+          <br />
         </p>
         <a href="{{.URL}}" target="_blank" style="
                 background-color: #f97316;

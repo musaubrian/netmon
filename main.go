@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -40,12 +41,16 @@ type Logr struct {
 }
 
 var (
-	dRecs      Logr
-	records    [][]Record
-	spikes     []string
+	dRecs   Logr
+	records [][]Record
+	spikes  []string
+
 	down       bool
 	netDownErr string
 	alertOnUp  = true
+
+	downTimeStart    time.Time
+	savedOutDownTime = false
 )
 
 func main() {
@@ -114,6 +119,11 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 			netDownErr = createLogErr(err.Error(), time.Now())
 			down = true
 			alertOnUp = false
+			if down && !savedOutDownTime {
+				downTimeStart = time.Now()
+				log.Println("WENT DOWN AT:", downTimeStart.Format(time.Stamp))
+			}
+			savedOutDownTime = true
 		}
 
 		// ping results
@@ -123,7 +133,15 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 		if !down && !alertOnUp {
 			down = false
 			alertOnUp = true
-			if err := notifyOnBackOnline(uri); err != nil {
+			savedOutDownTime = false
+
+			l := &LastLog{
+				URL:      uri,
+				Start:    downTimeStart.Format(time.TimeOnly),
+				Duration: formatDuration(time.Since(downTimeStart)),
+			}
+
+			if err := notifyOnBackOnline(l); err != nil {
 				log.Println(err)
 			}
 		}
@@ -200,4 +218,13 @@ func Config() *NetMonConf {
 
 func clearRecords(r [][]Record) [][]Record {
 	return [][]Record{}
+}
+func formatDuration(t time.Duration) string {
+	v := float64(t) / float64(time.Second)
+	if v >= 60.00 {
+		v = float64(t) / float64(time.Minute)
+		return fmt.Sprintf("%.2f Minutes", v)
+	}
+
+	return fmt.Sprintf("%.2f Seconds", v)
 }
