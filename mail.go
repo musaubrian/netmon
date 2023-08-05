@@ -5,20 +5,6 @@ import (
 	"net/smtp"
 )
 
-type ServiceLocation struct {
-	URL string
-}
-
-type Spike struct {
-	T   string
-	Lat uint16
-}
-
-type Alert struct {
-	MaxLat    int
-	LastSpike Spike
-}
-
 func possibleDowntimeMail(t *Alert) error {
 	// Recipient(s) email address(es)
 	recipients := Config().Recipients

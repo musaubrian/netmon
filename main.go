@@ -12,34 +12,6 @@ import (
 	probing "github.com/prometheus-community/pro-bing"
 )
 
-type NetMonConf struct {
-	// For authentication
-	Email      string
-	Pwd        string
-	NgrokToken string
-
-	S          string // Server to ping
-	Port       int
-	Recipients []string
-	MaxLat     int
-
-	// Maximum pinger timeout
-	// How long to wait for a response before ignoring that ping's results
-	// If a ping exceeds this, its result defaults to 0
-	TimeOut int
-}
-
-type Record struct {
-	Start   time.Time `json:"start"`
-	Latency uint16    `json:"latency"`
-}
-
-type Logr struct {
-	Day       string     `json:"day"`
-	UpdatedAt string     `json:"updated_at"`
-	Records   [][]Record `json:"records"`
-}
-
 var (
 	dRecs   Logr
 	records [][]Record

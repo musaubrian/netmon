@@ -50,7 +50,7 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func gif(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./web/static/calltronix.gif")
+	http.ServeFile(w, r, "./web/static/logo.gif")
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {
