@@ -5,11 +5,12 @@ import (
 	"net/smtp"
 )
 
+const MIME = "Content-Type: text/html; charset=utf-8\r\n"
+
 func possibleDowntimeMail(t *Alert) error {
 	// Recipient(s) email address(es)
 	recipients := Config().Recipients
 
-	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	body, err := alertMailTempl(t)
 	if err != nil {
 		return err
@@ -17,7 +18,7 @@ func possibleDowntimeMail(t *Alert) error {
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient +
 			"\r\nSubject: 🚨 Latency Anomaly - Requesting Investigation\r\n" +
-			mime + "\r\n" + body.String())
+			MIME + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
@@ -30,7 +31,7 @@ func possibleDowntimeMail(t *Alert) error {
 /*
 Send the server's location to concerned parties.
 
-Ideally should only ever happen once when the program is launched
+Only ever happen once when the program is launched
 */
 func serverLocMail(uri string) error {
 	recipients := Config().Recipients
@@ -43,10 +44,9 @@ func serverLocMail(uri string) error {
 		log.Fatal(err)
 	}
 
-	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient +
-			"\r\nSubject: Service location\r\n" + mime + "\r\n" + body.String())
+			"\r\nSubject: Service location\r\n" + MIME + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
@@ -69,10 +69,9 @@ func notifyOnBackOnline(lg *LastLog) error {
 		return err
 	}
 
-	lg.Time = s[0]
+	lg.Date = s[0]
 	lg.Time = s[1]
 
-	mime := "Content-Type: text/html; charset=utf-8\r\n"
 	body, err := backOnlineNotif(lg)
 	if err != nil {
 		return err
@@ -80,7 +79,7 @@ func notifyOnBackOnline(lg *LastLog) error {
 	for _, recipient := range recipients {
 		email := []byte("To:" + recipient +
 			"\r\nSubject: 📡 Back Online\r\n" +
-			mime + "\r\n" + body.String())
+			MIME + "\r\n" + body.String())
 		err := sendMail(recipient, email)
 		if err != nil {
 			return err
