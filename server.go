@@ -14,7 +14,7 @@ import (
 
 func Server(ctx context.Context, tunn ngrok.Tunnel) {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/gif", gif)
+	mux.HandleFunc("/logo", logo)
 	mux.HandleFunc("/favicon", favicon)
 	mux.HandleFunc("/lats", getLatencies)
 	mux.HandleFunc("/", displayGraph)
@@ -49,8 +49,16 @@ func displayGraph(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func gif(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./web/static/logo.gif")
+func logo(w http.ResponseWriter, r *http.Request) {
+	f, err := getLogo()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if len(f) < 1 {
+		f = "./web/static/netmon.png"
+	}
+	http.ServeFile(w, r, f)
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {

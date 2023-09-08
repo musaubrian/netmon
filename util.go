@@ -39,10 +39,36 @@ func cleanNetDownErr(n string) ([]string, error) {
 // Contents of the gif as a base64 string
 func base64Gif() (string, error) {
 	var b64 string
-	g, err := os.ReadFile("./web/static/calltronix.gif")
+	f, err := getLogo()
+	if err != nil {
+		return b64, err
+	}
+	g, err := os.ReadFile(f)
 	if err != nil {
 		return b64, err
 	}
 	b64 = base64.StdEncoding.EncodeToString(g)
 	return b64, err
+}
+
+func getLogo() (string, error) {
+	var logo string
+	loc := "./web/static/"
+
+	c, err := os.ReadDir(loc)
+	if err != nil {
+		return logo, err
+	}
+
+	for _, v := range c {
+		if strings.Contains(v.Name(), "logo") {
+			return loc + v.Name(), err
+		}
+	}
+	return logo, err
+}
+
+func getType(file string) string {
+	t := strings.Split(file, ".")
+	return t[2]
 }

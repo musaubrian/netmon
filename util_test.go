@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -33,7 +34,27 @@ func TestBase64Gif(t *testing.T) {
 		t.Errorf("Expected nil got %v", err)
 	}
 	if len(s) < 1 {
-		t.Error("Expected a noe empty string")
+		t.Error("Expected a none empty string")
 	}
 
+}
+
+func TestGetLogo(t *testing.T) {
+	res, err := getLogo()
+	if err != nil {
+		t.Errorf("Expected nil got %v", err)
+	}
+
+	if len(res) < 1 {
+		t.Error("Expected none empty string")
+	}
+}
+
+func TestGetType(t *testing.T) {
+	res, _ := getLogo()
+	ty := getType(res)
+
+	if len(ty) < 1 {
+		t.Error("Expected none empty string")
+	}
 }
