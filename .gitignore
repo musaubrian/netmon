@@ -22,3 +22,4 @@ _*
 go.work
 config.yml
 logs/
+bin/
