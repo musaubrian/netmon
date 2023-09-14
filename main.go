@@ -170,16 +170,14 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 		default:
 		}
 
-		// Send two pings per second
-		// time.Sleep(500 * time.Millisecond)
 	}
 }
 
 func Config() *NetMonConf {
 	return &NetMonConf{
-		Email:      os.Getenv("email"),
-		Pwd:        os.Getenv("pwd"),
-		NgrokToken: os.Getenv("ngrok_token"),
+		Email:      os.Getenv("EMAIL"),
+		Pwd:        os.Getenv("PWD"),
+		NgrokToken: os.Getenv("NGROK_TOKEN"),
 		S:          getServerToPing(),
 		Port:       getPort(),
 		Recipients: getEmails(),
@@ -191,6 +189,7 @@ func Config() *NetMonConf {
 func clearRecords(r [][]Record) [][]Record {
 	return [][]Record{}
 }
+
 func formatDuration(t time.Duration) string {
 	v := float64(t) / float64(time.Second)
 	if v >= 60.00 {

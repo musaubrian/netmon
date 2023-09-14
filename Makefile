@@ -1,6 +1,6 @@
 GO := go
 SRC := .
-BIN := _netmon
+BIN := netmon
 BIN_DIR := ./bin
 LOG_DIR := ./logs
 BIN_LOC := $(BIN_DIR)/$(BIN)

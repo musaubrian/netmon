@@ -65,8 +65,6 @@ func favicon(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/static/favicon.ico")
 }
 
-// extract NGROK initialization to function
-// So as I can access the URL [tunn.URL()]
 func createNgrokListener(ctx context.Context, token string) (ngrok.Tunnel, error) {
 	tunn, err := ngrok.Listen(
 		ctx,
