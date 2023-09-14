@@ -2,6 +2,7 @@
 
 NetMon is a network monitoring tool(hence the name), built using [Pro-bing](https://github.com/prometheus-community/pro-bing)
 that can be used to detect network fluctuations and alert the relevant parties.
+
 When launched, it constantly runs an `ICMP ECHO_REQUEST` command(ping) and
 analyses the results of the command.
 Alerts the responsible people when the latencies exceed a pre-defined amount.
@@ -72,6 +73,6 @@ go test -v ./...
 
 ### Known Issues
 
-1. Graph dips to 0 a lot 
+##### 1. Graph dips to 0 a lot 
 Try increasing the **max_latency** value
 This happened more on windows
