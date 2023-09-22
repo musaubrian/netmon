@@ -12,6 +12,7 @@ people configured in config.yml
 > **NOTE**
 > 
 > To use it you need to **clone** the repo not install it using `go install`
+>
 > Might add more unnecessary features later
 
 ## Usage
