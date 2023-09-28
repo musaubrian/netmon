@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/base64"
 	"errors"
 	"os"
 	"strings"
@@ -36,24 +35,10 @@ func cleanNetDownErr(n string) ([]string, error) {
 	return s, nil
 }
 
-// Contents of the gif as a base64 string
-func base64Gif() (string, error) {
-	var b64 string
-	f, err := getLogo()
-	if err != nil {
-		return b64, err
-	}
-	g, err := os.ReadFile(f)
-	if err != nil {
-		return b64, err
-	}
-	b64 = base64.StdEncoding.EncodeToString(g)
-	return b64, err
-}
-
 func getLogo() (string, error) {
 	var logo string
 	loc := "./web/static/"
+	defLogo := loc + "netmon.png"
 
 	c, err := os.ReadDir(loc)
 	if err != nil {
@@ -62,8 +47,12 @@ func getLogo() (string, error) {
 
 	for _, v := range c {
 		if strings.Contains(v.Name(), "logo") {
-			return loc + v.Name(), err
+			logo = loc + v.Name()
 		}
+	}
+	if len(logo) < 1 {
+		logo = defLogo
+
 	}
 	return logo, err
 }

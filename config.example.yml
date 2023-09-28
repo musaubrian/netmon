@@ -12,8 +12,10 @@ server:
   # Windows defender has something to do with this
   pinger_timeout: 500 # In milliseconds
 
-# People to notify
-emails:
-  - user@domain
-  - user@domain
-  - user@domain
+department:
+  name: example
+  # People to notify in department
+  emails:
+    - user@domain
+    - user@domain
+    - user@domain

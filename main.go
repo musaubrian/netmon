@@ -176,11 +176,12 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 func Config() *NetMonConf {
 	return &NetMonConf{
 		Email:      os.Getenv("EMAIL"),
-		Pwd:        os.Getenv("PWD"),
+		Pwd:        os.Getenv("PASSWORD"),
 		NgrokToken: os.Getenv("NGROK_TOKEN"),
 		S:          getServerToPing(),
 		Port:       getPort(),
 		Recipients: getEmails(),
+		Department: getDeptName(),
 		MaxLat:     getMaxLat(),
 		TimeOut:    getPingerTimeout(),
 	}

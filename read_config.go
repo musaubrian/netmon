@@ -28,9 +28,16 @@ func getServerToPing() string {
 func getPort() int {
 	return viper.GetInt("server.web_server_port")
 }
+func getDeptName() string {
+	dept := viper.GetString("department.name")
+	if len(dept) < 1 {
+		return "SOME DEPARTMENT"
+	}
+	return dept
+}
 
 func getEmails() []string {
-	return viper.GetStringSlice("emails")
+	return viper.GetStringSlice("department.emails")
 }
 
 func getMaxLat() int {

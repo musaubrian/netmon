@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -17,7 +17,7 @@
 
   <body
     style="
-      font-family: 'Varela Round', sans-serif;
+      font-family: &quot;Varela Round&quot;, sans-serif;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -114,10 +114,10 @@
         labels: xValues,
         datasets: [
           {
-            fill: false,
-            lineTension: 0.2,
+            fill: true,
+            lineTension: 0.25,
             pointRadius: 0,
-            backgroundColor: "white",
+            backgroundColor: "rgba(42, 29, 245, 0.027)",
             borderColor: "rgba(42, 29, 245, 0.8)",
             data: yValues,
           },
@@ -158,10 +158,9 @@
         },
       },
     });
-
     //initial fetch
     fetchLogs();
 
-    setInterval(fetchLogs(), 60 * 1000);
+    setInterval(fetchLogs(), 5000);
   </script>
 </html>

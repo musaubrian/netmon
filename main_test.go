@@ -9,7 +9,7 @@ import (
 func TestConfig(t *testing.T) {
 	expected := &NetMonConf{
 		Email:      os.Getenv("EMAIL"),
-		Pwd:        os.Getenv("PWD"),
+		Pwd:        os.Getenv("PASSWORD"),
 		NgrokToken: os.Getenv("NGROK_TOKEN"),
 		S:          getServerToPing(),
 		Port:       getPort(),

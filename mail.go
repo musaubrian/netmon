@@ -24,7 +24,7 @@ func possibleDowntimeMail(t *Alert) error {
 			return err
 		}
 	}
-	log.Println("L1 NOTIFIED ON NETWORK ISSUES")
+	log.Printf("[%s] NOTIFIED ON NETWORK ISSUES\n", Config().Department)
 	return nil
 }
 
@@ -53,7 +53,7 @@ func serverLocMail(uri string) error {
 		}
 	}
 
-	log.Println("SHARED NETMON'S LOCATION")
+	log.Printf("SHARED NETMON'S LOCATION TO [%s]\n", Config().Department)
 	return nil
 }
 

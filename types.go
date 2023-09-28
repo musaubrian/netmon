@@ -12,6 +12,7 @@ type NetMonConf struct {
 	Port       int
 	Recipients []string
 	MaxLat     int
+	Department string //department name to use in logs
 
 	// Maximum pinger timeout
 	// How long to wait for a response before ignoring that ping's results
