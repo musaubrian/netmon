@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 )
 
-func WriteFatalLog(e string) {
+func WriteFatalLog(e string) error {
 	t := time.Now()
 	// add a new line to the result
 	c := createLogErr(e, t)
@@ -15,10 +14,11 @@ func WriteFatalLog(e string) {
 	p := "logs" + string(os.PathSeparator) + "fatal"
 	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0o660)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 	f.WriteString(content)
+	return nil
 }
 
 func WriteLatenciesLog() error {

@@ -36,3 +36,12 @@ func TestCreateLogErr(t *testing.T) {
 		t.Errorf("Expected [%s] got %s", formattedT, _fT)
 	}
 }
+
+func TestWriteFatalLog(t *testing.T) {
+
+	e := "Sample error"
+	res := WriteFatalLog(e)
+	if res != nil {
+		t.Errorf("Expected nil got %v", res)
+	}
+}
