@@ -10,5 +10,7 @@ func main() {
 	g.CopyResources("web")
 	g.CopyResources(".env")
 	g.CopyResources("config.yml")
+	g.AddCommand("./build/netmon")
 	g.Build()
+	g.RunCommands()
 }

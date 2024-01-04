@@ -1,7 +1,9 @@
 package gno
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -81,8 +83,7 @@ func (g *gnoDets) BootstrapBuild(buildDirLocation string, bin string, source str
 	} else {
 		err := os.Mkdir(g.buildDir, 0o770)
 		if err != nil {
-			logMsg(err.Error(), "warn")
-			logMsg("Skipping build dir creation", "info")
+			logMsg(fmt.Sprintf("`%s` already exists, skipping", g.buildDir), "info")
 		} else {
 			logMsg("Created build directory", "info")
 		}
@@ -95,16 +96,6 @@ func (g gnoDets) CopyResources(src string) {
 }
 
 // Add commands to be executed
-// These are run synchronously, so they need to be ordered correctly
-//
-// TO run in a non blocking way, run them in the background with `&`
-// example:
-//
-// g.AddCommand("templ", "--generate &")
-//
-// or
-//
-// g.AddCommand("templ", "--generate", "&")
 func (g *gnoDets) AddCommand(name string, opts ...string) {
 	c := &command{
 		name: name,
@@ -124,18 +115,44 @@ func spaceCmdOpts(opts ...string) []string {
 	return spacedOut
 }
 
-func runCommands(g gnoDets) {
+func printOutput(reader io.Reader) {
+	scanner := bufio.NewScanner(reader)
+	fmt.Println()
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		logMsg("Error reading output: "+err.Error(), "error")
+	}
+}
+
+func (g gnoDets) RunCommands() {
 	if len(g.commands) >= 1 {
 		for _, v := range g.commands {
 			opts := spaceCmdOpts(v.opts...)
 			ms := fmt.Sprintf("Running command: `%s %s`", v.name, formatOpts(v.opts))
 			logMsg(ms, "cmd")
-			res, err := exec.Command(v.name, opts...).CombinedOutput()
+			cmd := exec.Command(v.name, opts...)
+
+			res, err := cmd.StdoutPipe()
 			if err != nil {
-				logMsg(string(res), "warn")
 				logMsg(err.Error(), "error")
-			} else {
-				fmt.Println(string(res))
+			}
+
+			stdErr, err := cmd.StderrPipe()
+			if err != nil {
+				logMsg(err.Error(), "error")
+			}
+			if err := cmd.Start(); err != nil {
+				logMsg("Could not start cmd", "error")
+			}
+
+			go printOutput(res)
+			go printOutput(stdErr)
+
+			if err := cmd.Wait(); err != nil {
+				logMsg(err.Error(), "error")
 			}
 		}
 	} else {
@@ -144,9 +161,9 @@ func runCommands(g gnoDets) {
 }
 
 // Builds the binary and runs the commands Synchronously
+// So they need to be ordered correctly
 func (g gnoDets) Build() {
 	buildBinary(g)
-	runCommands(g)
 }
 
 func buildBinary(g gnoDets) {
