@@ -52,24 +52,12 @@ Environment variables
 Navigate to the root of the project
 
 ```bash
-# Linux 
-make start
-## or
-go build -o ./bin .
-./bin/netmon
-
-# Windows
-make.bat 
-## or
-go build . 
-netmon.exe
+go run cmd/build.go
 ```
 
 #### Tests
 
 ```bash
-make test 
-# or
 go test -v ./...
 ```
 
