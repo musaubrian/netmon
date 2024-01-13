@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 	"time"
 
+	g "github.com/musaubrian/netmon/gno"
 	probing "github.com/prometheus-community/pro-bing"
 )
 
@@ -28,11 +28,11 @@ var (
 func main() {
 	if err := loadEnv(); err != nil {
 		WriteFatalLog(err.Error())
-		log.Fatal(err)
+		g.Log(g.ERROR, err.Error())
 	}
 	if err := loadConfig(); err != nil {
 		WriteFatalLog(err.Error())
-		log.Fatal(err)
+		g.Log(g.ERROR, err.Error())
 	}
 
 	today := time.Now()
@@ -49,7 +49,7 @@ func main() {
 	tunn, err := createNgrokListener(ctx, ngrok_token)
 	if err != nil {
 		WriteFatalLog(err.Error())
-		log.Fatal(err)
+		g.Log(g.ERROR, err.Error())
 	}
 
 	// Start up http server
@@ -57,7 +57,7 @@ func main() {
 
 	if err := serverLocMail(tunn.URL()); err != nil {
 		WriteFatalLog(err.Error())
-		log.Fatal(err)
+		g.Log(g.ERROR, err.Error())
 	}
 
 	startNetmon(Config().S, timeOutCount, ticker, todayStr, tunn.URL())
@@ -75,7 +75,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 		if err != nil {
 			err = errors.Join(errors.New("PINGER INITIALIZATION ERR: "), err)
 			WriteFatalLog(err.Error())
-			log.Fatal(err)
+			g.Log(g.ERROR, err.Error())
 		}
 
 		// WINDOWS PRIVILEGES
@@ -93,7 +93,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 			alertOnUp = false
 			if down && !savedOutDownTime {
 				downTimeStart = time.Now()
-				log.Println("NETWORK DOWN")
+				g.Log(g.WARN, "NETWORK DOWN")
 			}
 			savedOutDownTime = true
 		}
@@ -114,7 +114,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 			}
 
 			if err := notifyOnBackOnline(l); err != nil {
-				log.Println(err)
+				g.Log(g.WARN, err.Error())
 			}
 		}
 		if int(latency.Milliseconds()) >= maxLat {
@@ -126,7 +126,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 		if tCount >= 3 {
 			tCount = 0
 			if err := WriteLatenciesLog(); err != nil {
-				log.Fatal(err)
+				g.Log(g.ERROR, err.Error())
 			}
 			alert := &Alert{
 				MaxLat: maxLat,
@@ -137,7 +137,7 @@ func startNetmon(s string, tCount int, t *time.Ticker, today string, uri string)
 			}
 			err := possibleDowntimeMail(alert)
 			if err != nil {
-				log.Println(err)
+				g.Log(g.WARN, err.Error())
 			}
 			// Sleep for 10 minutes after alerting
 			// You have 10 minutes max to find the solution to the issue

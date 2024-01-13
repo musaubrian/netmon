@@ -1,8 +1,10 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/smtp"
+
+	g "github.com/musaubrian/netmon/gno"
 )
 
 const MIME = "Content-Type: text/html; charset=utf-8\r\n"
@@ -24,7 +26,7 @@ func possibleDowntimeMail(t *Alert) error {
 			return err
 		}
 	}
-	log.Printf("[%s] NOTIFIED ON NETWORK ISSUES\n", Config().Department)
+	g.Log(g.INFO, fmt.Sprintf("[%s] NOTIFIED ON NETWORK ISSUES\n", Config().Department))
 	return nil
 }
 
@@ -41,7 +43,7 @@ func serverLocMail(uri string) error {
 
 	body, err := serviceLocTempl(loc)
 	if err != nil {
-		log.Fatal(err)
+		g.Log(g.ERROR, err.Error())
 	}
 
 	for _, recipient := range recipients {
@@ -53,7 +55,7 @@ func serverLocMail(uri string) error {
 		}
 	}
 
-	log.Printf("SHARED NETMON'S LOCATION TO [%s]\n", Config().Department)
+	g.Log(g.INFO, fmt.Sprintf("SHARED NETMON'S LOCATION TO [%s] DEPARTMENT", Config().Department))
 	return nil
 }
 
@@ -85,7 +87,7 @@ func notifyOnBackOnline(lg *LastLog) error {
 			return err
 		}
 	}
-	log.Println("BACK ONLINE")
+	g.Log(g.INFO, "BACK ONLINE")
 	return nil
 }
 

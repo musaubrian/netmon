@@ -1,50 +1,40 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/x-icon" href="/favicon" />
-    <title>NetMon</title>
-  </head>
 
-  <body
-    style="
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="/favicon" />
+  <title>NetMon</title>
+</head>
+
+<body style="
       font-family: &quot;Varela Round&quot;, sans-serif;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       height: 100vh;
-    "
-  >
-    <div
-      style="
+    ">
+  <div style="
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100vw;
         height: auto;
-      "
-    >
-      <div
-        class="logo"
-        style="
+      ">
+    <div class="logo" style="
           width: 100%;
           height: 7.5vh;
           display: inline-flex;
           align-items: center;
-        "
-      >
-        <div
-          style="
+        ">
+      <div style="
             height: 100%;
             width: 18%;
             margin-left: 1rem;
@@ -52,115 +42,111 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-          "
-        ></div>
-      </div>
-      <h1 id="h1" style="text-align: center; margin-bottom: 0; width: 50%"></h1>
-
-      <canvas
-        id="myChart"
-        style="max-height: 70vh; height: 50vh; max-width: 90vw"
-        aria-label="Graph of latency by time"
-        role="image"
-      >
-      </canvas>
-      <h2 id="h2" style="text-align: center; font-size: 1.14rem"></h2>
+          "></div>
     </div>
-  </body>
-  <script>
-    const h1 = document.getElementById("h1");
-    const h2 = document.getElementById("h2");
+    <h1 id="h1" style="text-align: center; margin-bottom: 0; width: 50%"></h1>
 
-    function fetchLogs() {
-      return fetch("/lats")
-        .then((response) => response.json())
-        .then((data) => {
-          let records = data.records;
-          h1.innerHTML = data.day;
-          h2.innerHTML = `Updated at: ${data.updated_at}`;
-          let newxValues = [];
-          let newyValues = [];
+    <canvas id="myChart" style="max-height: 70vh; height: 50vh; max-width: 90vw" aria-label="Graph of latency by time"
+      role="image">
+    </canvas>
+    <h2 id="h2" style="text-align: center; font-size: 1.14rem"></h2>
+  </div>
+</body>
+<script>
+  const h1 = document.getElementById("h1");
+  const h2 = document.getElementById("h2");
 
-          let startLoopIndex = Math.max(0, records.length - 60); // Get last 60 items(minute)
+  function fetchLogs() {
+    return fetch("/lats")
+      .then((response) => response.json())
+      .then((data) => {
+        let records = data.records;
+        h1.innerHTML = data.day;
+        h2.innerHTML = `Updated at: ${data.updated_at}`;
+        let newxValues = [];
+        let newyValues = [];
 
-          for (let i = startLoopIndex; i < records.length; i++) {
-            let record = records[i];
-            for (let j = 0; j < record.length; j++) {
-              newxValues.push(dayjs(record[j].start).format("hh:MM:ss A"));
-              newyValues.push(record[j].latency);
-            }
+        let startLoopIndex = Math.max(0, records.length - 60); // Get last 60 items(minute)
+
+        for (let i = startLoopIndex; i < records.length; i++) {
+          let record = records[i];
+          for (let j = 0; j < record.length; j++) {
+            newxValues.push(dayjs(record[j].start).format("hh:MM:ss A"));
+            newyValues.push(record[j].latency);
           }
+        }
 
-          // // Replace x&yValues with new values
-          xValues.splice(0, xValues.length, ...newxValues);
-          yValues.splice(0, yValues.length, ...newyValues);
+        // // Replace x&yValues with new values
+        xValues.splice(0, xValues.length, ...newxValues);
+        yValues.splice(0, yValues.length, ...newyValues);
 
-          // Trigger chart update
-          myChart.data.labels = xValues;
-          myChart.data.datasets[0].data = yValues;
-          myChart.update();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+        // Trigger chart update
+        myChart.data.labels = xValues;
+        myChart.data.datasets[0].data = yValues;
+        myChart.update();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 
-    const xValues = [];
-    const yValues = [];
+  const xValues = [];
+  const yValues = [];
 
-    const myChart = new Chart("myChart", {
-      type: "line",
-      data: {
-        labels: xValues,
-        datasets: [
+  const myChart = new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [
+        {
+          fill: true,
+          lineTension: 0.25,
+          pointRadius: 0,
+          backgroundColor: "rgba(42, 29, 245, 0.027)",
+          borderColor: "rgba(42, 29, 245, 0.8)",
+          data: yValues,
+        },
+      ],
+    },
+    options: {
+      title: {
+        display: true,
+        text: "Latency per request",
+        fontSize: 22,
+      },
+      legend: {
+        display: false,
+      },
+      scales: {
+        xAxes: [
           {
-            fill: true,
-            lineTension: 0.25,
-            pointRadius: 0,
-            backgroundColor: "rgba(42, 29, 245, 0.027)",
-            borderColor: "rgba(42, 29, 245, 0.8)",
-            data: yValues,
+            gridLines: {
+              display: false,
+            },
+            ticks: {display: false},
+            scaleLabel: {
+              display: true,
+              labelString: "Requests",
+              fontSize: 15,
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ticks: {min: 0},
+            scaleLabel: {
+              display: false,
+              labelString: "Latency(ms)",
+            },
           },
         ],
       },
-      options: {
-        title: {
-          display: true,
-          text: "Latency per request",
-          fontSize: 22,
-        },
-        legend: {
-          display: false,
-        },
-        scales: {
-          xAxes: [
-            {
-              gridLines: {
-                display: false,
-              },
-              ticks: { display: false },
-              scaleLabel: {
-                display: true,
-                labelString: "Requests",
-                fontSize: 15,
-              },
-            },
-          ],
-          yAxes: [
-            {
-              ticks: { min: 0 },
-              scaleLabel: {
-                display: false,
-                labelString: "Latency(ms)",
-              },
-            },
-          ],
-        },
-      },
-    });
-    //initial fetch
-    fetchLogs();
+    },
+  });
+  //initial fetch
+  fetchLogs();
 
-    setInterval(fetchLogs(), 5000);
-  </script>
+  setInterval(fetchLogs(), 5000);
+</script>
+
 </html>

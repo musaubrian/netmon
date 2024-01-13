@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	g "github.com/musaubrian/netmon/gno"
 	"golang.ngrok.com/ngrok"
 	"golang.ngrok.com/ngrok/config"
 )
@@ -19,7 +20,7 @@ func Server(ctx context.Context, tunn ngrok.Tunnel) {
 	mux.HandleFunc("/lats", getLatencies)
 	mux.HandleFunc("/", displayGraph)
 
-	log.Println("TUNNEL CREATED AT:", tunn.URL())
+	g.Log(g.INFO, "TUNNEL CREATED AT: "+tunn.URL())
 	log.Fatal(http.Serve(tunn, mux))
 }
 
